@@ -1,23 +1,25 @@
 {
-  "name": "@ootkin/node-template",
+  "name": "skimx",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ootkin/node-template.git"
+    "url": "https://github.com/ootkin/skimx.git"
   },
   "version": "1.0.3",
-  "description": "A starter template for nodejs applications",
+  "description": "Create web applications using OpenAPI schemas",
   "files": [
     "dist"
   ],
   "main": "dist/index.js",
   "keywords": [
-    "boilerplate",
-    "node",
-    "template",
-    "starter",
+    "skimx",
+    "express",
     "typescript",
-    "prettier",
-    "eslint"
+    "zod",
+    "zod-openapi",
+    "openapi",
+    "oas",
+    "generator",
+    "specification"
   ],
   "scripts": {
     "test": "jest --coverage",
@@ -36,6 +38,7 @@
   "devDependencies": {
     "@commitlint/cli": "^18.4.3",
     "@commitlint/config-conventional": "^18.4.3",
+    "@types/express": "^4.17.21",
     "@types/jest": "^29.5.11",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
@@ -52,6 +55,8 @@
     "*.{ts,md,yaml,yml,json,js}": "npm run format:fix"
   },
   "dependencies": {
+    "@skimx/zod-to-openapi": "^1.0.4",
+    "express": "^4.18.2",
     "ts-node": "^10.9.2"
   },
   "publishConfig": {
