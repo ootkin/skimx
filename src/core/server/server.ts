@@ -1,14 +1,8 @@
 import express, { ErrorRequestHandler, RequestHandler } from 'express';
-import {
-	extendZodWithOpenApi,
-	OpenApiGeneratorV3,
-	OpenApiGeneratorV31,
-	OpenAPIRegistry,
-} from '@skimx/zod-to-openapi';
 import * as z from 'zod';
 import { Server as HTTPServer } from 'http';
-import { OpenAPIObjectConfigV31 } from '@skimx/zod-to-openapi/dist/v3.1/openapi-generator';
-import { OpenAPIObjectConfig } from '@skimx/zod-to-openapi/dist/v3.0/openapi-generator';
+import { createDocument, extendZodWithOpenApi } from 'zod-openapi';
+import { ZodOpenApiObject } from 'zod-openapi/lib-types/create/document';
 
 extendZodWithOpenApi(z);
 
@@ -18,11 +12,8 @@ extendZodWithOpenApi(z);
 export class Server {
 	private express = express();
 	private server?: HTTPServer;
-	private readonly openApiRegistry: OpenAPIRegistry;
 
-	constructor() {
-		this.openApiRegistry = new OpenAPIRegistry();
-	}
+	constructor() {}
 
 	/**
    * Attach middlewares, handlers, routers and errors handlers to the express instance
@@ -52,33 +43,15 @@ export class Server {
 	/**
    * Get the express server instance
    */
-	public getExpressInstance = () => {
+	public get expressInstance() {
 		return this.express;
-	};
+	}
 
 	/**
-   * Get the openApi registry
-   */
-	public getOpenApiRegistry = () => {
-		return this.openApiRegistry;
-	};
-
-	/**
-   * Generate OpenApi Specification v3.1.x
-   */
-	public generateOpenApiSpecV31 = (config: OpenAPIObjectConfigV31) => {
-		return new OpenApiGeneratorV31(
-			this.openApiRegistry.definitions,
-		).generateDocument(config);
-	};
-
-	/**
-   * Generate OpenApi Specification v3.0.x
+   * Generate OpenApi Specification
    * @param config
    */
-	public generateOpenApiSpecV3 = (config: OpenAPIObjectConfig) => {
-		return new OpenApiGeneratorV3(
-			this.openApiRegistry.definitions,
-		).generateDocument(config);
+	public generateOpenAPISpecification = (config: ZodOpenApiObject) => {
+		return createDocument(config);
 	};
 }

@@ -1,94 +1,45 @@
-import { RouteConfig, ZodContentObject } from '@skimx/zod-to-openapi';
-import {
-	ZodMediaTypeObject,
-	ZodRequestBody,
-} from '@skimx/zod-to-openapi/dist/openapi-registry';
 import * as z from 'zod';
 import * as core from 'express-serve-static-core';
 
-export type RouteRequest<S extends RouteConfig> = S['request'];
+export type RouteSchema = {
+  summary?: string;
+  contentType?: string;
+  request?: {
+    query?: z.ZodSchema;
+    params?: z.ZodSchema;
+    headers?: z.ZodSchema;
+    body?: z.ZodSchema;
+  };
+  responses: {
+    [status: number]: {
+      description: string;
+      schema: z.ZodSchema;
+    };
+  };
+};
 
-export type RouteRequestBody<
-  S extends RouteConfig,
+export type RouteRequest<S extends RouteSchema> = S['request'];
+
+export type RequestParams<
+  S extends RouteSchema,
   R extends RouteRequest<S>,
-> = R extends {
-  body: ZodRequestBody;
-}
-  ? R['body']
-  : undefined;
-
-export type RouteRequestBodyContent<
-  S extends RouteConfig,
-  R extends RouteRequest<S>,
-  B extends RouteRequestBody<S, R>,
-> = B extends {
-  content: ZodContentObject;
-}
-  ? B['content']
-  : undefined;
-
-export type RouteRequestBodyContentApplicationJson<
-  S extends RouteConfig,
-  R extends RouteRequest<S>,
-  B extends RouteRequestBody<S, R>,
-  C extends RouteRequestBodyContent<S, R, B>,
-> = C extends { 'application/json': ZodMediaTypeObject }
-  ? C['application/json']
-  : undefined;
-
-export type RouteResponseStatus<S extends RouteConfig> = keyof S['responses'];
-
-export type RouteResponseContent<
-  S extends RouteConfig,
-  Status extends RouteResponseStatus<S>,
-> = S['responses'][Status]['content'];
-
-export type RouteResponseContentApplicationJson<
-  S extends RouteConfig,
-  Status extends RouteResponseStatus<S>,
-  C extends RouteResponseContent<S, Status>,
-> = C extends { 'application/json': ZodMediaTypeObject }
-  ? C['application/json']
-  : undefined;
-
-export type RouteRequestParams<
-  S extends RouteConfig,
-  T extends RouteRequest<S>,
-> = T extends { params: z.ZodType }
-  ? z.infer<T['params']>
+> = R extends { params: z.ZodSchema }
+  ? z.infer<R['params']>
   : core.ParamsDictionary;
 
-export type RouteRequestQuery<
-  S extends RouteConfig,
-  T extends RouteRequest<S>,
-> = T extends { query: z.ZodType }
-  ? z.infer<T['query']>
-  : core.ParamsDictionary;
+export type RequestQuery<
+  S extends RouteSchema,
+  R extends RouteRequest<S>,
+> = R extends { query: z.ZodSchema } ? z.infer<R['query']> : core.Query;
 
-export type RouteResponseBody<
-  Schema extends RouteConfig,
-  ResponseStatus extends RouteResponseStatus<Schema>,
-  ResponseContent extends RouteResponseContent<Schema, ResponseStatus>,
-  Json extends RouteResponseContentApplicationJson<
-    Schema,
-    ResponseStatus,
-    ResponseContent
-  >,
-> = Json extends {
-  schema: z.ZodType;
-}
-  ? z.infer<Json['schema']>
+export type RequestBody<
+  S extends RouteSchema,
+  R extends RouteRequest<S>,
+> = R extends { body: z.ZodSchema } ? z.infer<R['body']> : unknown;
+
+export type ResponseBody<
+  S extends RouteSchema,
+  R extends RouteRequest<S>,
+> = R[keyof R] extends { schema: z.ZodSchema }
+  ? z.infer<R[keyof R]['schema']>
   : unknown;
-
-export type RouteRequestBodyContentApplicationJsonSchema<
-  Schema extends RouteConfig,
-  Request extends RouteRequest<Schema>,
-  Body extends RouteRequestBody<Schema, Request>,
-  BodyContent extends RouteRequestBodyContent<Schema, Request, Body>,
-  Json extends RouteRequestBodyContentApplicationJson<
-    Schema,
-    Request,
-    Body,
-    BodyContent
-  >,
-> = Json extends { schema: z.ZodType } ? z.infer<Json['schema']> : unknown;
