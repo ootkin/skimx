@@ -8,6 +8,8 @@ import {
 } from 'zod-openapi';
 import { Server } from '../core';
 import { RouteSchema } from '../core/router/router.types';
+import { ZodType } from 'zod';
+import { AnyZodObject } from '../zod';
 
 interface OpenApiObject extends Omit<ZodOpenApiObject, 'path' | 'openapi'> {}
 
@@ -43,13 +45,13 @@ function generateResponses(schema: RouteSchema): ZodOpenApiResponsesObject {
 function generateRequestParams(schema: RouteSchema): ZodOpenApiParameters {
   const requestParams: ZodOpenApiParameters = {};
   if (schema.request?.params) {
-    requestParams.path = schema.request.params;
+    requestParams.path = schema.request.params as AnyZodObject;
   }
   if (schema.request?.query) {
-    requestParams.query = schema.request.query;
+    requestParams.query = schema.request.query as AnyZodObject;
   }
   if (schema.request?.headers) {
-    requestParams.header = schema.request.headers;
+    requestParams.header = schema.request.headers as AnyZodObject;
   }
   return requestParams;
 }
