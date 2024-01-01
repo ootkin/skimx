@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/ootkin/skimx.git"
   },
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Create web applications using OpenAPI schemas",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
