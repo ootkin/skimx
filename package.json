@@ -8,9 +8,6 @@
   "description": "Create web applications using OpenAPI schemas",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "keywords": [
     "skimx",
     "express",
