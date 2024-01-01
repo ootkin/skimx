@@ -1,0 +1,41 @@
+{
+	"openapi": "3.1.0",
+	"info": {
+		"title": "Test",
+		"version": "1.0.0"
+	},
+	"paths": {
+		"/test": {
+			"get": {
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"schema": {
+							"type": "string"
+						},
+						"required": true
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"id": {
+											"type": "string"
+										}
+									},
+									"required": ["id"]
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,5 +1,4 @@
 import { Server } from './server';
-import { OpenAPIRegistry } from '@skimx/zod-to-openapi';
 import { Router } from 'express';
 
 describe('Server', () => {
@@ -10,12 +9,7 @@ describe('Server', () => {
 
 	it('should create an express instance', () => {
 		const server = new Server();
-		expect(server.getExpressInstance()).not.toBeFalsy();
-	});
-
-	it('should create an OpenAPI registry', () => {
-		const server = new Server();
-		expect(server.getOpenApiRegistry()).toBeInstanceOf(OpenAPIRegistry);
+		expect(server.expressInstance).not.toBeFalsy();
 	});
 
 	it('should listen on a specified port', (done) => {
@@ -53,43 +47,5 @@ describe('Server', () => {
 					server.close(done);
 				});
 		});
-	});
-
-	it('should generate OpenApi (v3.1) config', () => {
-		const server = new Server();
-		const doc = server.generateOpenApiSpecV31({
-			info: {
-				title: 'Skeemex',
-				version: '0.0.0',
-			},
-			openapi: '3.1.0',
-			security: [],
-			servers: [{ url: 'http://skimx.com' }],
-			tags: [{ name: 'skimx' }],
-		});
-		expect(doc.info.title).toBe('Skeemex');
-		expect(doc.info.version).toBe('0.0.0');
-		expect(doc.openapi).toBe('3.1.0');
-		expect(doc.servers).not.toBe(undefined);
-		expect(doc.tags).not.toBe(undefined);
-	});
-
-	it('should generate OpenApi (v3.0) config', () => {
-		const server = new Server();
-		const doc = server.generateOpenApiSpecV3({
-			info: {
-				title: 'Skeemex',
-				version: '0.0.0',
-			},
-			openapi: '3.0.0',
-			security: [],
-			servers: [{ url: 'http://skimx.com' }],
-			tags: [{ name: 'skimx' }],
-		});
-		expect(doc.info.title).toBe('Skeemex');
-		expect(doc.info.version).toBe('0.0.0');
-		expect(doc.openapi).toBe('3.0.0');
-		expect(doc.servers).not.toBe(undefined);
-		expect(doc.tags).not.toBe(undefined);
 	});
 });

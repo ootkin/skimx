@@ -1,23 +1,18 @@
 import {
 	Router as ExpressRouter,
 	RequestHandler,
-	Response,
-	Request,
+	Response as ExpressResponse,
+	Request as ExpressRequest,
 	NextFunction,
 } from 'express';
-import { OpenAPIRegistry, RouteConfig } from '@skimx/zod-to-openapi';
 import {
-	RouteResponseStatus,
 	RouteRequest,
-	RouteRequestBody,
-	RouteRequestBodyContent,
-	RouteRequestBodyContentApplicationJson,
-	RouteResponseContent,
-	RouteResponseContentApplicationJson,
-	RouteRequestParams,
-	RouteResponseBody,
-	RouteRequestBodyContentApplicationJsonSchema,
-	RouteRequestQuery,
+	RequestBody,
+	RequestParams,
+	RequestQuery,
+	RouteSchema,
+	ResponseBody,
+	RouterRoute,
 } from './router.types';
 import { ZodSchema } from 'zod';
 
@@ -25,18 +20,18 @@ import { ZodSchema } from 'zod';
  * A wrapper around the express Router
  */
 export class Router {
-	public router = ExpressRouter();
+	public expressRouter = ExpressRouter();
+	public routes: RouterRoute[] = [];
 
-	constructor(private readonly openAPIRegistry?: OpenAPIRegistry) {}
+	constructor() {}
 
 	/**
-   * Validate the request using OAS
-   * @param schema
-   */
-	private validateRequest = (schema: RouteConfig) => {
-		return (req: Request, res: Response, next: NextFunction) => {
-			const bodySchema =
-        schema.request?.body?.content['application/json'].schema;
+	 * Validate the request using OAS
+	 * @param schema
+	 */
+	private validateRequest = (schema: RouteSchema) => {
+		return (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
+			const bodySchema = schema.request?.body;
 			const paramSchema = schema.request?.params;
 			const querySchema = schema.request?.query;
 
@@ -54,121 +49,197 @@ export class Router {
 		};
 	};
 
-	/**
-   * Validate the response using OAS
-   * @param schema
-   */
-	private validateResponse = (schema: RouteConfig) => {
-		return (req: Request, res: Response, next: NextFunction) => {
-			const response = schema.responses[res.statusCode.toString()].content;
-			if (!response || !response['application/json'].schema) {
-				return next();
-			}
-			const responseSchema = response['application/json'].schema;
-			if (responseSchema instanceof ZodSchema) {
-				responseSchema.parse(req.body);
-			}
-
-			return next();
-		};
+	private registerRoute = ({ method, path, schema }: RouterRoute) => {
+		const exists = this.routes.find(
+			(r) => r.method === method && r.path === path,
+		);
+		if (exists) {
+			throw new Error(`${method} method already exists for path ${path}`);
+		}
+		this.routes.push({ method, path, schema });
 	};
 
 	/**
-   * Transform openApi path to express path
-   * @param path
-   */
-	public formatPath = (path: string) => {
-		return path.replace(/{(.*?)}/g, ':$1');
-	};
-
-	/**
-   * Wrapper around express router use
-   * @param schema
-   * @param handlers
-   */
-	public use<
-    Schema extends RouteConfig,
-    Request extends RouteRequest<Schema>,
-    Body extends RouteRequestBody<Schema, Request>,
-    BodyContent extends RouteRequestBodyContent<Schema, Request, Body>,
-    BodyJson extends RouteRequestBodyContentApplicationJson<
-      Schema,
-      Request,
-      Body,
-      BodyContent
-    >,
-    ResponseStatus extends RouteResponseStatus<Schema>,
-    ResponseContent extends RouteResponseContent<Schema, ResponseStatus>,
-    ResponseContentJson extends RouteResponseContentApplicationJson<
-      Schema,
-      ResponseStatus,
-      ResponseContent
-    >,
-    Params extends RouteRequestParams<Schema, Request>,
-    Query extends RouteRequestQuery<Schema, Request>,
-    ResponseBody extends RouteResponseBody<
-      Schema,
-      ResponseStatus,
-      ResponseContent,
-      ResponseContentJson
-    >,
-    RequestBody extends RouteRequestBodyContentApplicationJsonSchema<
-      Schema,
-      Request,
-      Body,
-      BodyContent,
-      BodyJson
-    >,
-  >(
+	 * GET
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
+	public get<
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
+		path: string,
 		schema: Schema,
-		...handlers: RequestHandler<Params, ResponseBody, RequestBody, Query>[]
+		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
 	) {
-		/**
-     * Format path
-     */
-		schema.path = this.formatPath(schema.path);
+		this.registerRoute({ schema, path, method: 'get' });
+		this.expressRouter.get(path, this.validateRequest(schema), ...handlers);
+		return this;
+	}
 
-		/**
-     * Register path schema
-     */
-		this.openAPIRegistry?.registerPath(schema);
+	/**
+	 * POST
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
+	public post<
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
+		path: string,
+		schema: Schema,
+		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+	) {
+		this.registerRoute({ schema, path, method: 'post' });
+		this.expressRouter.post(path, this.validateRequest(schema), ...handlers);
+		return this;
+	}
 
-		/**
-     * Map methods
-     */
-		if (schema.method === 'get') {
-			this.router.get(schema.path, this.validateRequest(schema), ...handlers);
-		}
-		if (schema.method === 'post') {
-			this.router.post(schema.path, this.validateRequest(schema), ...handlers);
-		}
-		if (schema.method === 'put') {
-			this.router.put(schema.path, this.validateRequest(schema), ...handlers);
-		}
-		if (schema.method === 'patch') {
-			this.router.patch(schema.path, this.validateRequest(schema), ...handlers);
-		}
-		if (schema.method === 'delete') {
-			this.router.delete(
-				schema.path,
-				this.validateRequest(schema),
-				...handlers,
-			);
-		}
-		if (schema.method === 'options') {
-			this.router.options(
-				schema.path,
-				this.validateRequest(schema),
-				...handlers,
-			);
-		}
-		if (schema.method === 'head') {
-			this.router.head(schema.path, this.validateRequest(schema), ...handlers);
-		}
-		if (schema.method === 'trace') {
-			this.router.trace(schema.path, this.validateRequest(schema), ...handlers);
-		}
+	/**
+	 * PUT
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
+	public put<
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
+		path: string,
+		schema: Schema,
+		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+	) {
+		this.registerRoute({ schema, path, method: 'put' });
+		this.expressRouter.put(path, this.validateRequest(schema), ...handlers);
+		return this;
+	}
 
+	/**
+	 * PATCH
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
+	public patch<
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
+		path: string,
+		schema: Schema,
+		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+	) {
+		this.registerRoute({ schema, path, method: 'patch' });
+		this.expressRouter.patch(path, this.validateRequest(schema), ...handlers);
+		return this;
+	}
+
+	/**
+	 * DELETE
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
+	public delete<
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
+		path: string,
+		schema: Schema,
+		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+	) {
+		this.registerRoute({ schema, path, method: 'delete' });
+		this.expressRouter.delete(path, this.validateRequest(schema), ...handlers);
+		return this;
+	}
+
+	/**
+	 * OPTIONS
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
+	public options<
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
+		path: string,
+		schema: Schema,
+		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+	) {
+		this.registerRoute({ schema, path, method: 'options' });
+		this.expressRouter.options(path, this.validateRequest(schema), ...handlers);
+		return this;
+	}
+
+	/**
+	 * HEAD
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
+	public head<
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
+		path: string,
+		schema: Schema,
+		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+	) {
+		this.registerRoute({ schema, path, method: 'head' });
+		this.expressRouter.head(path, this.validateRequest(schema), ...handlers);
+		return this;
+	}
+
+	/**
+	 * TRACE
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
+	public trace<
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
+		path: string,
+		schema: Schema,
+		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+	) {
+		this.registerRoute({ schema, path, method: 'trace' });
+		this.expressRouter.trace(path, this.validateRequest(schema), ...handlers);
 		return this;
 	}
 }
