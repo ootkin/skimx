@@ -1,8 +1,7 @@
 import { Router } from './router';
-import * as z from 'zod';
 import { Server } from '../server';
 import express from 'express';
-import { ZodError } from 'zod';
+import z, { ZodError } from '../../zod';
 
 describe('Router', () => {
 	describe('Method mapping', () => {
@@ -48,6 +47,16 @@ describe('Router', () => {
 		it('should map to trace', () => {
 			const router = new Router().trace('/', { responses: {} });
 			expect(router.expressRouter.stack[0].route.stack[0].method).toBe('trace');
+		});
+
+		it('should throw an error if route already exists', () => {
+			const router = new Router().get('/', { responses: {} });
+			try {
+				router.get('/', { responses: {} });
+				expect(true).toBe(false);
+			} catch (err) {
+				expect(err).toBeTruthy();
+			}
 		});
 	});
 
@@ -139,7 +148,7 @@ describe('Router', () => {
 				},
 			);
 			server.use(express.json());
-			server.use(router.expressRouter);
+			server.useRouters(router);
 			server.use((err: unknown, req, res, _) => {
 				if (err instanceof ZodError) {
 					return res

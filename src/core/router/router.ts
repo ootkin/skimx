@@ -12,6 +12,7 @@ import {
 	RequestQuery,
 	RouteSchema,
 	ResponseBody,
+	RouterRoute,
 } from './router.types';
 import { ZodSchema } from 'zod';
 
@@ -20,13 +21,14 @@ import { ZodSchema } from 'zod';
  */
 export class Router {
 	public expressRouter = ExpressRouter();
+	public routes: RouterRoute[] = [];
 
 	constructor() {}
 
 	/**
-   * Validate the request using OAS
-   * @param schema
-   */
+	 * Validate the request using OAS
+	 * @param schema
+	 */
 	private validateRequest = (schema: RouteSchema) => {
 		return (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
 			const bodySchema = schema.request?.body;
@@ -47,178 +49,196 @@ export class Router {
 		};
 	};
 
+	private registerRoute = ({ method, path, schema }: RouterRoute) => {
+		const exists = this.routes.find(
+			(r) => r.method === method && r.path === path,
+		);
+		if (exists) {
+			throw new Error(`${method} method already exists for path ${path}`);
+		}
+		this.routes.push({ method, path, schema });
+	};
+
 	/**
-   * GET
-   * @param path
-   * @param schema
-   * @param handlers
-   */
+	 * GET
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
 	public get<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
-  >(
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
 		path: string,
 		schema: Schema,
 		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
 	) {
+		this.registerRoute({ schema, path, method: 'get' });
 		this.expressRouter.get(path, this.validateRequest(schema), ...handlers);
 		return this;
 	}
 
 	/**
-   * POST
-   * @param path
-   * @param schema
-   * @param handlers
-   */
+	 * POST
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
 	public post<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
-  >(
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
 		path: string,
 		schema: Schema,
 		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
 	) {
+		this.registerRoute({ schema, path, method: 'post' });
 		this.expressRouter.post(path, this.validateRequest(schema), ...handlers);
 		return this;
 	}
 
 	/**
-   * PUT
-   * @param path
-   * @param schema
-   * @param handlers
-   */
+	 * PUT
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
 	public put<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
-  >(
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
 		path: string,
 		schema: Schema,
 		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
 	) {
+		this.registerRoute({ schema, path, method: 'put' });
 		this.expressRouter.put(path, this.validateRequest(schema), ...handlers);
 		return this;
 	}
 
 	/**
-   * PATCH
-   * @param path
-   * @param schema
-   * @param handlers
-   */
+	 * PATCH
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
 	public patch<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
-  >(
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
 		path: string,
 		schema: Schema,
 		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
 	) {
+		this.registerRoute({ schema, path, method: 'patch' });
 		this.expressRouter.patch(path, this.validateRequest(schema), ...handlers);
 		return this;
 	}
 
 	/**
-   * DELETE
-   * @param path
-   * @param schema
-   * @param handlers
-   */
+	 * DELETE
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
 	public delete<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
-  >(
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
 		path: string,
 		schema: Schema,
 		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
 	) {
+		this.registerRoute({ schema, path, method: 'delete' });
 		this.expressRouter.delete(path, this.validateRequest(schema), ...handlers);
 		return this;
 	}
 
 	/**
-   * OPTIONS
-   * @param path
-   * @param schema
-   * @param handlers
-   */
+	 * OPTIONS
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
 	public options<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
-  >(
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
 		path: string,
 		schema: Schema,
 		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
 	) {
+		this.registerRoute({ schema, path, method: 'options' });
 		this.expressRouter.options(path, this.validateRequest(schema), ...handlers);
 		return this;
 	}
 
 	/**
-   * HEAD
-   * @param path
-   * @param schema
-   * @param handlers
-   */
+	 * HEAD
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
 	public head<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
-  >(
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
 		path: string,
 		schema: Schema,
 		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
 	) {
+		this.registerRoute({ schema, path, method: 'head' });
 		this.expressRouter.head(path, this.validateRequest(schema), ...handlers);
 		return this;
 	}
 
 	/**
-   * TRACE
-   * @param path
-   * @param schema
-   * @param handlers
-   */
+	 * TRACE
+	 * @param path
+	 * @param schema
+	 * @param handlers
+	 */
 	public trace<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
-  >(
+		Schema extends RouteSchema,
+		Req extends RouteRequest<Schema>,
+		Params extends RequestParams<Schema, Req>,
+		Query extends RequestQuery<Schema, Req>,
+		ReqBody extends RequestBody<Schema, Req>,
+		ResBody extends ResponseBody<Schema, Req>,
+	>(
 		path: string,
 		schema: Schema,
 		...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
 	) {
+		this.registerRoute({ schema, path, method: 'trace' });
 		this.expressRouter.trace(path, this.validateRequest(schema), ...handlers);
 		return this;
 	}

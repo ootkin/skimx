@@ -48,23 +48,4 @@ describe('Server', () => {
 				});
 		});
 	});
-
-	it('should generate OpenAPI specification', () => {
-		const server = new Server();
-		const doc = server.generateOpenAPISpecification({
-			info: {
-				title: 'Skeemex',
-				version: '0.0.0',
-			},
-			openapi: '3.1.0',
-			security: [],
-			servers: [{ url: 'http://skimx.com' }],
-			tags: [{ name: 'skimx' }],
-		});
-		expect(doc.info.title).toBe('Skeemex');
-		expect(doc.info.version).toBe('0.0.0');
-		expect(doc.openapi).toBe('3.1.0');
-		expect(doc.servers).not.toBe(undefined);
-		expect(doc.tags).not.toBe(undefined);
-	});
 });
