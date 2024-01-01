@@ -36,13 +36,13 @@ You can also specify a custom error handler. For example:
 import { Request, Response, NextFunction } from 'express';
 
 const errorHandler = (
-	error: unknown,
-	req: Request,
-	res: Response,
-	next: NextFunction,
+  error: unknown,
+  req: Request,
+  res: Response,
+  next: NextFunction,
 ) => {
-	console.log(error.message);
-	return res.status(500).json({ message: error.message });
+  console.log(error.message);
+  return res.status(500).json({ message: error.message });
 };
 
 server.use(errorHandler); // make sure that is is the last handler
@@ -68,7 +68,7 @@ Start the server on the given port.
 
 ```ts
 server.listen(3000, () => {
-	console.log('server is listening on port 3000');
+  console.log('server is listening on port 3000');
 });
 ```
 
@@ -78,9 +78,9 @@ Stops the server from accepting new connections and keeps existing connections.
 
 ```ts
 server.close((error) => {
-	if (error) {
-		console.log(error.message);
-	}
+  if (error) {
+    console.log(error.message);
+  }
 });
 ```
 
@@ -95,24 +95,24 @@ import z from 'skimx/zod';
 const router = new Router();
 
 const TodoSchema = z.object({
-	id: z.number(),
-	description: z.string(),
+  id: z.number(),
+  description: z.string(),
 });
 
 router.get(
-	'/v1/todos',
-	{
-		responses: {
-			200: {
-				description: 'A list of todos',
-				schema: z.array(TodoSchema),
-			},
-		},
-	},
-	async (req, res, next) => {
-		const todos = await fetchTodos();
-		res.status(200).json(todos);
-	},
+  '/v1/todos',
+  {
+    responses: {
+      200: {
+        description: 'A list of todos',
+        schema: z.array(TodoSchema),
+      },
+    },
+  },
+  async (req, res, next) => {
+    const todos = await fetchTodos();
+    res.status(200).json(todos);
+  },
 );
 ```
 
@@ -133,31 +133,31 @@ import z from 'skimx/zod';
 const router = new Router();
 
 const TodoSchema = z.object({
-	id: z.number(),
-	description: z.string(),
+  id: z.number(),
+  description: z.string(),
 });
 
 router.get(
-	'/v1/todos/:param',
-	{
-		request: {
-			// Specify the schema for req.params
-			params: z.object({ param: z.string() }),
-			// Specify the schema for req.query
-			query: z.object({ name: z.string() }),
-			// Specify the schema for req.headers
-			headers: z.object({ Authorization: z.string() }),
-		},
-		responses: {
-			200: {
-				description: 'A list of todos',
-				schema: z.array(TodoSchema),
-			},
-		},
-	},
-	(req, res, next) => {
-		/* your code here */
-	},
+  '/v1/todos/:param',
+  {
+    request: {
+      // Specify the schema for req.params
+      params: z.object({ param: z.string() }),
+      // Specify the schema for req.query
+      query: z.object({ name: z.string() }),
+      // Specify the schema for req.headers
+      headers: z.object({ Authorization: z.string() }),
+    },
+    responses: {
+      200: {
+        description: 'A list of todos',
+        schema: z.array(TodoSchema),
+      },
+    },
+  },
+  (req, res, next) => {
+    /* your code here */
+  },
 );
 ```
 
@@ -172,27 +172,27 @@ import z from 'skimx/zod';
 const router = new Router();
 
 const TodoSchema = z.object({
-	id: z.number(),
-	description: z.string(),
+  id: z.number(),
+  description: z.string(),
 });
 
 router.post(
-	'/v1/todos/',
-	{
-		request: {
-			// Specify the schema for req.params
-			body: TodoSchema,
-		},
-		responses: {
-			201: {
-				description: 'The created todo',
-				schema: TodoSchema,
-			},
-		},
-	},
-	(req, res, next) => {
-		/* your code here */
-	},
+  '/v1/todos/',
+  {
+    request: {
+      // Specify the schema for req.params
+      body: TodoSchema,
+    },
+    responses: {
+      201: {
+        description: 'The created todo',
+        schema: TodoSchema,
+      },
+    },
+  },
+  (req, res, next) => {
+    /* your code here */
+  },
 );
 ```
 
@@ -213,40 +213,40 @@ const server = new Server();
 const router = new Router();
 
 const TodoSchema = z.object({
-	id: z.number().openapi({ description: 'todo id', example: 1 }),
-	description: z
-		.string()
-		.openapi({ description: 'todo description', example: 'My first todo' }),
+  id: z.number().openapi({ description: 'todo id', example: 1 }),
+  description: z
+    .string()
+    .openapi({ description: 'todo description', example: 'My first todo' }),
 });
 
 router.get(
-	'/v1/pets',
-	{
-		request: {
-			query: z.object({ name: z.string() }),
-		},
-		responses: {
-			200: {
-				description: 'A list of todos',
-				schema: z.array(TodoSchema),
-			},
-		},
-	},
-	(req, res) => {
-		/* your code*/
-	},
+  '/v1/pets',
+  {
+    request: {
+      query: z.object({ name: z.string() }),
+    },
+    responses: {
+      200: {
+        description: 'A list of todos',
+        schema: z.array(TodoSchema),
+      },
+    },
+  },
+  (req, res) => {
+    /* your code*/
+  },
 );
 
 server.useRouters(router);
 
 const spec = generateSpec({
-	schema: {
-		info: {
-			title: 'my spec',
-			version: '1.0.0',
-		},
-	},
-	server,
+  schema: {
+    info: {
+      title: 'my spec',
+      version: '1.0.0',
+    },
+  },
+  server,
 });
 
 writeFileSync('spec.json', JSON.stringify(spec, null, 2));
@@ -256,55 +256,55 @@ The code above generates a `spec.json` file in the root of the project:
 
 ```json
 {
-	"info": {
-		"title": "my spec",
-		"version": "1.0.0"
-	},
-	"openapi": "3.1.0",
-	"paths": {
-		"/v1/pets": {
-			"get": {
-				"parameters": [
-					{
-						"in": "query",
-						"name": "name",
-						"schema": {
-							"type": "string"
-						},
-						"required": true
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "A list of todos",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "array",
-									"items": {
-										"type": "object",
-										"properties": {
-											"id": {
-												"type": "number",
-												"description": "todo id",
-												"example": 1
-											},
-											"description": {
-												"type": "string",
-												"description": "todo description",
-												"example": "My first todo"
-											}
-										},
-										"required": ["id", "description"]
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+  "info": {
+    "title": "my spec",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/v1/pets": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "name",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of todos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "description": "todo id",
+                        "example": 1
+                      },
+                      "description": {
+                        "type": "string",
+                        "description": "todo description",
+                        "example": "My first todo"
+                      }
+                    },
+                    "required": ["id", "description"]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
 ```
 
