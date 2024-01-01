@@ -80,7 +80,7 @@ describe('Router', () => {
 				},
 			);
 
-			server.use(express.json(), router.expressRouter);
+			server.useRouters(router);
 
 			server.listen(8083, () => {
 				fetch('http://localhost:8083/params/1', {
@@ -114,7 +114,7 @@ describe('Router', () => {
 					res.json(req.query);
 				},
 			);
-			server.use(express.json(), router.expressRouter);
+			server.useRouters(router);
 
 			server.listen(8082, () => {
 				fetch('http://localhost:8082/query?id=1')
@@ -147,7 +147,7 @@ describe('Router', () => {
 					res.json(req.body);
 				},
 			);
-			server.use(express.json());
+
 			server.useRouters(router);
 			server.use((err: unknown, req, res, _) => {
 				if (err instanceof ZodError) {

@@ -5,7 +5,6 @@ import generateSpec from './generator';
 
 describe('generator', () => {
 	const server = new Server();
-	server.use(express.json());
 
 	const router = new Router();
 

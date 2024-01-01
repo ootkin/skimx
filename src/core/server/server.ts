@@ -11,7 +11,9 @@ export class Server {
 	private server?: HTTPServer;
 	public routes: RouterRoute[] = [];
 
-	constructor() {}
+	constructor() {
+		this.app.use(express.json());
+	}
 
 	/**
 	 * Attach middlewares and handlers to the express instance
