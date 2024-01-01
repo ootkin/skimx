@@ -6,6 +6,8 @@
   },
   "version": "1.0.0",
   "description": "Create web applications using OpenAPI schemas",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
@@ -32,7 +34,6 @@
   },
   "author": "ootkin",
   "license": "MIT",
-  "types": "dist",
   "devDependencies": {
     "@commitlint/cli": "^18.4.3",
     "@commitlint/config-conventional": "^18.4.3",
