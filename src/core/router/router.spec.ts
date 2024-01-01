@@ -1,6 +1,5 @@
 import { Router } from './router';
 import { Server } from '../server';
-import express from 'express';
 import z, { ZodError } from '../../zod';
 
 describe('Router', () => {

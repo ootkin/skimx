@@ -13,6 +13,7 @@ import {
   RouteSchema,
   ResponseBody,
   RouterRoute,
+  RouteResponses,
 } from './router.types';
 import { ZodSchema } from 'zod';
 
@@ -68,10 +69,11 @@ export class Router {
   public get<
     Schema extends RouteSchema,
     Req extends RouteRequest<Schema>,
+    Res extends RouteResponses<Schema>,
     Params extends RequestParams<Schema, Req>,
     Query extends RequestQuery<Schema, Req>,
     ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
+    ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
     schema: Schema,
@@ -91,10 +93,11 @@ export class Router {
   public post<
     Schema extends RouteSchema,
     Req extends RouteRequest<Schema>,
+    Res extends RouteResponses<Schema>,
     Params extends RequestParams<Schema, Req>,
     Query extends RequestQuery<Schema, Req>,
     ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
+    ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
     schema: Schema,
@@ -114,10 +117,11 @@ export class Router {
   public put<
     Schema extends RouteSchema,
     Req extends RouteRequest<Schema>,
+    Res extends RouteResponses<Schema>,
     Params extends RequestParams<Schema, Req>,
     Query extends RequestQuery<Schema, Req>,
     ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
+    ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
     schema: Schema,
@@ -137,10 +141,11 @@ export class Router {
   public patch<
     Schema extends RouteSchema,
     Req extends RouteRequest<Schema>,
+    Res extends RouteResponses<Schema>,
     Params extends RequestParams<Schema, Req>,
     Query extends RequestQuery<Schema, Req>,
     ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
+    ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
     schema: Schema,
@@ -160,10 +165,11 @@ export class Router {
   public delete<
     Schema extends RouteSchema,
     Req extends RouteRequest<Schema>,
+    Res extends RouteResponses<Schema>,
     Params extends RequestParams<Schema, Req>,
     Query extends RequestQuery<Schema, Req>,
     ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
+    ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
     schema: Schema,
@@ -183,10 +189,11 @@ export class Router {
   public options<
     Schema extends RouteSchema,
     Req extends RouteRequest<Schema>,
+    Res extends RouteResponses<Schema>,
     Params extends RequestParams<Schema, Req>,
     Query extends RequestQuery<Schema, Req>,
     ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
+    ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
     schema: Schema,
@@ -206,10 +213,11 @@ export class Router {
   public head<
     Schema extends RouteSchema,
     Req extends RouteRequest<Schema>,
+    Res extends RouteResponses<Schema>,
     Params extends RequestParams<Schema, Req>,
     Query extends RequestQuery<Schema, Req>,
     ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
+    ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
     schema: Schema,
@@ -229,10 +237,11 @@ export class Router {
   public trace<
     Schema extends RouteSchema,
     Req extends RouteRequest<Schema>,
+    Res extends RouteResponses<Schema>,
     Params extends RequestParams<Schema, Req>,
     Query extends RequestQuery<Schema, Req>,
     ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Req>,
+    ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
     schema: Schema,

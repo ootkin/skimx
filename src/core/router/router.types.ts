@@ -20,6 +20,7 @@ export type RouteSchema = {
 };
 
 export type RouteRequest<S extends RouteSchema> = S['request'];
+export type RouteResponses<S extends RouteSchema> = S['responses'];
 
 export type RequestParams<
   S extends RouteSchema,
@@ -40,7 +41,7 @@ export type RequestBody<
 
 export type ResponseBody<
   S extends RouteSchema,
-  R extends RouteRequest<S>,
+  R extends RouteResponses<S>,
 > = R[keyof R] extends { schema: AnyZodObject }
   ? z.infer<R[keyof R]['schema']>
   : unknown;
