@@ -9,7 +9,7 @@ describe('generator', () => {
   const router = new Router();
 
   const PetSchema = zod.object({
-    id: zod.string(),
+    id: zod.number(),
     name: zod.string(),
   });
 
@@ -27,7 +27,7 @@ describe('generator', () => {
       },
     },
     (req, res) => {
-      res.status(200).json({ message: 'ok' });
+      res.status(200).json({ id: 1, name: 'Sabo' });
     },
   );
 
@@ -49,7 +49,7 @@ describe('generator', () => {
       },
     },
     (req, res) => {
-      res.status(200).json({ message: 'ok' });
+      res.status(400).json({ status: 400, message: 'not found' });
     },
   );
 
@@ -71,7 +71,7 @@ describe('generator', () => {
       },
     },
     (req, res) => {
-      res.status(200).json({ message: 'ok' });
+      res.status(200).json({ id: 1, name: 'Sabo' });
     },
   );
 
@@ -94,7 +94,7 @@ describe('generator', () => {
       },
     },
     (req, res) => {
-      res.status(200).json({ message: 'ok' });
+      res.status(200).json({ id: 1, name: 'Sabo' });
     },
   );
 
@@ -113,7 +113,7 @@ describe('generator', () => {
       },
     },
     (req, res) => {
-      res.status(201).json({ message: 'ok' });
+      res.status(201).json({ id: 1, name: 'Sabo' });
     },
   );
 
