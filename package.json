@@ -26,6 +26,7 @@
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "prepare": "husky install",
+    "prepublish": "tsc",
     "build": "tsc",
     "start": "node dist/index.js"
   },
