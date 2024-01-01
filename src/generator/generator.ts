@@ -90,7 +90,6 @@ function generatePaths(server: Server): ZodOpenApiPathsObject {
 export default function generateSpec(args: {
 	schema: OpenApiObject;
 	server: Server;
-	fileName?: string;
 }) {
 	return createDocument({
 		...args.schema,
