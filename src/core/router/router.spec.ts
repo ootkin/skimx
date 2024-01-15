@@ -187,5 +187,128 @@ describe('Router', () => {
           });
       });
     });
+
+    it('should transforms req.body', (done) => {
+      const schema = z.object({ id: z.string().toUpperCase() });
+      const server = new Server();
+      const router = new Router().post(
+        '/body',
+        {
+          request: {
+            body: schema,
+          },
+          responses: {
+            200: {
+              description: '',
+              schema,
+            },
+          },
+        },
+        (req, res) => {
+          res.json(req.body);
+        },
+      );
+
+      server.useRouters(router);
+
+      server.listen(8086, () => {
+        fetch('http://localhost:8086/body', {
+          method: 'post',
+          body: JSON.stringify({ id: 'lowercase' }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+          .then((res) => res.json())
+          .then((res) => {
+            expect(res.id).toBe('LOWERCASE');
+          })
+          .catch((err) => expect(err).toBeUndefined())
+          .finally(() => {
+            server.close(done);
+          });
+      });
+    });
+    it('should transform req.params', (done) => {
+      const schema = z.object({ id: z.string().toUpperCase() });
+      const server = new Server();
+      const router = new Router().get(
+        '/:id',
+        {
+          request: {
+            params: schema,
+          },
+          responses: {
+            200: {
+              description: '',
+              schema,
+            },
+          },
+        },
+        (req, res) => {
+          res.json(req.params);
+        },
+      );
+
+      server.useRouters(router);
+
+      server.listen(8087, () => {
+        fetch('http://localhost:8087/lowercase', {
+          method: 'get',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+          .then((res) => res.json())
+          .then((res) => {
+            expect(res.id).toBe('LOWERCASE');
+          })
+          .catch((err) => expect(err).toBeUndefined())
+          .finally(() => {
+            server.close(done);
+          });
+      });
+    });
+
+    it('should transform req.query', (done) => {
+      const schema = z.object({ id: z.string().toUpperCase() });
+      const server = new Server();
+      const router = new Router().get(
+        '/query',
+        {
+          request: {
+            query: schema,
+          },
+          responses: {
+            200: {
+              description: '',
+              schema,
+            },
+          },
+        },
+        (req, res) => {
+          res.json(req.query);
+        },
+      );
+
+      server.useRouters(router);
+
+      server.listen(8088, () => {
+        fetch('http://localhost:8088/query?id=lowercase', {
+          method: 'get',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+          .then((res) => res.json())
+          .then((res) => {
+            expect(res.id).toBe('LOWERCASE');
+          })
+          .catch((err) => expect(err).toBeUndefined())
+          .finally(() => {
+            server.close(done);
+          });
+      });
+    });
   });
 });

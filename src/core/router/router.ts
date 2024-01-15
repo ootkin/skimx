@@ -15,7 +15,7 @@ import {
   RouterRoute,
   RouteResponses,
 } from './router.types';
-import { ZodSchema } from 'zod';
+import { ZodSchema, z, ZodType } from 'zod';
 
 /**
  * A wrapper around the express Router
@@ -33,17 +33,19 @@ export class Router {
   private validateRequest = (schema: RouteSchema) => {
     return (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
       const bodySchema = schema.request?.body;
-      const paramSchema = schema.request?.params;
+      const paramsSchema = schema.request?.params;
       const querySchema = schema.request?.query;
 
       if (bodySchema instanceof ZodSchema) {
-        bodySchema.parse(req.body);
+        req.body = bodySchema.parse(req.body) as z.infer<typeof bodySchema>;
       }
-      if (paramSchema instanceof ZodSchema) {
-        paramSchema.parse(req.params);
+      if (paramsSchema instanceof ZodSchema) {
+        // @ts-expect-error we are use that the parsing is an object
+        req.params = paramsSchema.parse(req.params);
       }
       if (querySchema instanceof ZodSchema) {
-        querySchema.parse(req.query);
+        // @ts-expect-error we are use that the parsing is an object
+        req.query = querySchema.parse(req.query);
       }
 
       return next();
