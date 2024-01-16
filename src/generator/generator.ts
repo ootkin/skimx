@@ -27,14 +27,17 @@ function generatePath(path: string) {
   );
 }
 
-function generateResponses(schema: RouteSchema): ZodOpenApiResponsesObject {
+function generateResponses(
+  routeSchema: RouteSchema,
+): ZodOpenApiResponsesObject {
   const responses: ZodOpenApiResponsesObject = {};
-  Object.entries(schema.responses).forEach(
+
+  Object.entries(routeSchema.responses).forEach(
     ([status, { description, schema }]) => {
       responses[status as `${1 | 2 | 3 | 4 | 5}${string}`] = {
         description,
         content: {
-          'application/json': { schema },
+          [routeSchema.contentType || 'application/json']: { schema },
         },
       };
     },

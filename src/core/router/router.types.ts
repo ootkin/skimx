@@ -1,6 +1,6 @@
 import * as z from 'zod';
 import * as core from 'express-serve-static-core';
-import { AnyZodObject, ZodType } from '../../zod';
+import { ZodType } from '../../zod';
 
 export type RouteSchema = {
   summary?: string;
