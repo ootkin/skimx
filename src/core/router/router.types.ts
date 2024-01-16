@@ -4,7 +4,8 @@ import { ZodType } from '../../zod';
 
 export type RouteSchema = {
   summary?: string;
-  contentType?: string;
+  contentType?: 'application/json' | 'multipart/form-data';
+  operationId?: string;
   request?: {
     query?: ZodType<unknown>;
     params?: ZodType<unknown>;

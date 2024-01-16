@@ -8,7 +8,6 @@ import {
 } from 'zod-openapi';
 import { Server } from '../core';
 import { RouteSchema } from '../core/router/router.types';
-import { ZodType } from 'zod';
 import { AnyZodObject } from '../zod';
 
 interface OpenApiObject extends Omit<ZodOpenApiObject, 'path' | 'openapi'> {}
@@ -86,6 +85,7 @@ function generatePaths(server: Server): ZodOpenApiPathsObject {
       ...(requestParams && { requestParams }),
       ...(requestBody && { requestBody }),
       ...(responses && { responses }),
+      ...(schema.operationId && { operationId: schema.operationId }),
     };
   }
   return paths;
