@@ -5,53 +5,53 @@ import z, { ZodError } from '../../zod';
 describe('Router', () => {
   describe('Method mapping', () => {
     it('should map to get', () => {
-      const router = new Router().get('/', { responses: {} });
+      const router = new Router().get('/', { responses: {} }, []);
       expect(router.expressRouter.stack[0].route.stack[0].method).toBe('get');
     });
 
     it('should map to post', () => {
-      const router = new Router().post('/', { responses: {} });
+      const router = new Router().post('/', { responses: {} }, []);
       expect(router.expressRouter.stack[0].route.stack[0].method).toBe('post');
     });
 
     it('should map to put', () => {
-      const router = new Router().put('/', { responses: {} });
+      const router = new Router().put('/', { responses: {} }, []);
       expect(router.expressRouter.stack[0].route.stack[0].method).toBe('put');
     });
 
     it('should map to patch', () => {
-      const router = new Router().patch('/', { responses: {} });
+      const router = new Router().patch('/', { responses: {} }, []);
       expect(router.expressRouter.stack[0].route.stack[0].method).toBe('patch');
     });
 
     it('should map to delete', () => {
-      const router = new Router().delete('/', { responses: {} });
+      const router = new Router().delete('/', { responses: {} }, []);
       expect(router.expressRouter.stack[0].route.stack[0].method).toBe(
         'delete',
       );
     });
 
     it('should map to options', () => {
-      const router = new Router().options('/', { responses: {} });
+      const router = new Router().options('/', { responses: {} }, []);
       expect(router.expressRouter.stack[0].route.stack[0].method).toBe(
         'options',
       );
     });
 
     it('should map to head', () => {
-      const router = new Router().head('/', { responses: {} });
+      const router = new Router().head('/', { responses: {} }, []);
       expect(router.expressRouter.stack[0].route.stack[0].method).toBe('head');
     });
 
     it('should map to trace', () => {
-      const router = new Router().trace('/', { responses: {} });
+      const router = new Router().trace('/', { responses: {} }, []);
       expect(router.expressRouter.stack[0].route.stack[0].method).toBe('trace');
     });
 
     it('should throw an error if route already exists', () => {
-      const router = new Router().get('/', { responses: {} });
+      const router = new Router().get('/', { responses: {} }, []);
       try {
-        router.get('/', { responses: {} });
+        router.get('/', { responses: {} }, []);
         expect(true).toBe(false);
       } catch (err) {
         expect(err).toBeTruthy();
@@ -69,10 +69,11 @@ describe('Router', () => {
           responses: {
             200: {
               description: '',
-              schema: z.object({ id: z.string() }),
+              'application/json': z.object({ id: z.string() }),
             },
           },
         },
+        [],
         (req, res) => {
           expect(typeof req.params.id).toBe('string');
           res.json(req.params);
@@ -104,10 +105,11 @@ describe('Router', () => {
           responses: {
             200: {
               description: '',
-              schema: z.object({ id: z.string() }),
+              'application/json': z.object({ id: z.string() }),
             },
           },
         },
+        [],
         (req, res) => {
           expect(typeof req.query.id).toBe('string');
           res.json(req.query);
@@ -133,15 +135,16 @@ describe('Router', () => {
         '/body',
         {
           request: {
-            body: z.object({ id: z.string() }),
+            body: { 'application/json': z.object({ id: z.string() }) },
           },
           responses: {
             200: {
               description: '',
-              schema: z.object({ id: z.string() }),
+              'application/json': z.object({}),
             },
           },
         },
+        [],
         (req, res) => {
           res.json(req.body);
         },
@@ -195,15 +198,16 @@ describe('Router', () => {
         '/body',
         {
           request: {
-            body: schema,
+            body: { 'application/json': schema },
           },
           responses: {
             200: {
               description: '',
-              schema,
+              'application/json': schema,
             },
           },
         },
+        [],
         (req, res) => {
           res.json(req.body);
         },
@@ -245,6 +249,7 @@ describe('Router', () => {
             },
           },
         },
+        [],
         (req, res) => {
           res.json(req.params);
         },
@@ -286,6 +291,7 @@ describe('Router', () => {
             },
           },
         },
+        [],
         (req, res) => {
           res.json(req.query);
         },

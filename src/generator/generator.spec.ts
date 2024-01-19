@@ -22,10 +22,11 @@ describe('generator', () => {
       responses: {
         200: {
           description: 'Returns all pets',
-          schema: PetSchema,
+          'application/json': PetSchema,
         },
       },
     },
+    [],
     (req, res) => {
       res.status(200).json({ id: 1, name: 'Sabo' });
     },
@@ -40,14 +41,18 @@ describe('generator', () => {
       responses: {
         200: {
           description: 'Returns a pet',
-          schema: PetSchema,
+          'application/json': PetSchema,
         },
         404: {
           description: 'Pet not found',
-          schema: zod.object({ status: zod.number(), message: zod.string() }),
+          'application/json': zod.object({
+            status: zod.number(),
+            message: zod.string(),
+          }),
         },
       },
     },
+    [],
     (req, res) => {
       res.status(400).json({ status: 400, message: 'not found' });
     },
@@ -56,20 +61,25 @@ describe('generator', () => {
   router.post(
     '/v1/pets/',
     {
+      operationId: 'Create a pet',
       request: {
-        body: PetSchema,
+        body: { 'application/json': PetSchema },
       },
       responses: {
         200: {
           description: 'Returns a pet',
-          schema: PetSchema,
+          'application/json': PetSchema,
         },
         400: {
           description: 'Bad request',
-          schema: zod.object({ status: zod.number(), message: zod.string() }),
+          'application/json': zod.object({
+            status: zod.number(),
+            message: zod.string(),
+          }),
         },
       },
     },
+    [],
     (req, res) => {
       res.status(200).json({ id: 1, name: 'Sabo' });
     },
@@ -80,19 +90,23 @@ describe('generator', () => {
     {
       request: {
         params: zod.object({ id: zod.string() }),
-        body: PetSchema,
+        body: { 'application/json': PetSchema },
       },
       responses: {
         200: {
           description: 'Updated pet',
-          schema: PetSchema,
+          'application/json': PetSchema,
         },
         400: {
           description: 'Bad request',
-          schema: zod.object({ status: zod.number(), message: zod.string() }),
+          'application/json': zod.object({
+            status: zod.number(),
+            message: zod.string(),
+          }),
         },
       },
     },
+    [],
     (req, res) => {
       res.status(200).json({ id: 1, name: 'Sabo' });
     },
@@ -108,12 +122,49 @@ describe('generator', () => {
       responses: {
         201: {
           description: 'Deleted pet',
-          schema: PetSchema,
+          'application/json': PetSchema,
         },
       },
     },
+    [],
     (req, res) => {
       res.status(201).json({ id: 1, name: 'Sabo' });
+    },
+  );
+
+  router.post(
+    'v1/pets/multipart',
+    {
+      request: {
+        body: { 'multipart/form-data': zod.object({ id: zod.string() }) },
+      },
+      responses: {
+        201: {
+          description: 'Post multipart pet',
+          'application/json': PetSchema,
+        },
+      },
+    },
+    [],
+    (req, res) => {
+      res.status(201).send({ id: 1, name: 'Sabo' });
+    },
+  );
+
+  router.get(
+    'v1/pets/text',
+    {
+      request: {},
+      responses: {
+        200: {
+          description: 'get pets in text/plain',
+          'text/plain': zod.string(),
+        },
+      },
+    },
+    [],
+    (req, res) => {
+      res.status(201).send('sabo');
     },
   );
 
@@ -132,6 +183,7 @@ describe('generator', () => {
       },
       server,
     });
+    console.dir(spec, { depth: 100 });
     expect(spec.info.title).toBe(title);
     expect(spec.info.version).toBe(version);
     expect(spec.paths).toHaveProperty('/v1/pets');

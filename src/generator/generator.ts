@@ -31,16 +31,26 @@ function generateResponses(
 ): ZodOpenApiResponsesObject {
   const responses: ZodOpenApiResponsesObject = {};
 
-  Object.entries(routeSchema.responses).forEach(
-    ([status, { description, schema }]) => {
-      responses[status as `${1 | 2 | 3 | 4 | 5}${string}`] = {
-        description,
-        content: {
-          [routeSchema.contentType || 'application/json']: { schema },
-        },
-      };
-    },
-  );
+  Object.entries(routeSchema.responses).forEach(([status, response]) => {
+    const { description, ...rest } = response;
+    responses[status as `${1 | 2 | 3 | 4 | 5}${string}`] = {
+      description,
+      content: {
+        ...(rest['application/json'] && {
+          'application/json': { schema: rest['application/json'] },
+        }),
+        ...(rest['multipart/form-data'] && {
+          'multipart/form-data': { schema: rest['multipart/form-data'] },
+        }),
+        ...(rest['text/plain'] && {
+          'text/plain': { schema: rest['text/plain'] },
+        }),
+        ...(rest['text/html'] && {
+          'text/html': { schema: rest['text/html'] },
+        }),
+      },
+    };
+  });
   return responses;
 }
 
@@ -61,9 +71,38 @@ function generateRequestParams(schema: RouteSchema): ZodOpenApiParameters {
 function generateRequestBody(
   schema: RouteSchema,
 ): ZodOpenApiRequestBodyObject | undefined {
-  if (schema.request?.body) {
+  if (schema.request?.body && schema.request.body['application/json']) {
     return {
-      content: { 'application/json': { schema: schema.request.body } },
+      content: {
+        'application/json': { schema: schema.request.body['application/json'] },
+      },
+    };
+  }
+  if (schema.request?.body && schema.request.body['multipart/form-data']) {
+    return {
+      content: {
+        'multipart/form-data': {
+          schema: schema.request.body['multipart/form-data'],
+        },
+      },
+    };
+  }
+  if (schema.request?.body && schema.request.body['text/plain']) {
+    return {
+      content: {
+        'text/plain': {
+          schema: schema.request.body['text/plain'],
+        },
+      },
+    };
+  }
+  if (schema.request?.body && schema.request.body['text/html']) {
+    return {
+      content: {
+        'text/html': {
+          schema: schema.request.body['text/html'],
+        },
+      },
     };
   }
 }
