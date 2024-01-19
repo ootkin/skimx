@@ -32,12 +32,17 @@ export class Router {
    */
   private validateRequest = (schema: RouteSchema) => {
     return (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
-      const bodySchema = schema.request?.body;
+      const bodySchema =
+        schema.request?.body?.['application/json'] ||
+        schema.request?.body?.['multipart/form-data'] ||
+        schema.request?.body?.['text/plain'] ||
+        schema.request?.body?.['text/html'];
+
       const paramsSchema = schema.request?.params;
       const querySchema = schema.request?.query;
 
       if (bodySchema instanceof ZodSchema) {
-        req.body = bodySchema.parse(req.body) as z.infer<typeof bodySchema>;
+        req.body = bodySchema.parse(req.body);
       }
       if (paramsSchema instanceof ZodSchema) {
         // @ts-expect-error we are use that the parsing is an object
@@ -66,6 +71,7 @@ export class Router {
    * GET
    * @param path
    * @param schema
+   * @param middlewares
    * @param handlers
    */
   public get<
@@ -79,10 +85,17 @@ export class Router {
   >(
     path: string,
     schema: Schema,
+    middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
     this.registerRoute({ schema, path, method: 'get' });
-    this.expressRouter.get(path, this.validateRequest(schema), ...handlers);
+    this.expressRouter.get(
+      path,
+      this.validateRequest(schema),
+      ...middlewares,
+      ...handlers,
+    );
+
     return this;
   }
 
@@ -90,6 +103,7 @@ export class Router {
    * POST
    * @param path
    * @param schema
+   * @param middlewares
    * @param handlers
    */
   public post<
@@ -103,10 +117,16 @@ export class Router {
   >(
     path: string,
     schema: Schema,
+    middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
     this.registerRoute({ schema, path, method: 'post' });
-    this.expressRouter.post(path, this.validateRequest(schema), ...handlers);
+    this.expressRouter.post(
+      path,
+      this.validateRequest(schema),
+      ...middlewares,
+      ...handlers,
+    );
     return this;
   }
 
@@ -114,6 +134,7 @@ export class Router {
    * PUT
    * @param path
    * @param schema
+   * @param middlewares
    * @param handlers
    */
   public put<
@@ -127,10 +148,16 @@ export class Router {
   >(
     path: string,
     schema: Schema,
+    middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
     this.registerRoute({ schema, path, method: 'put' });
-    this.expressRouter.put(path, this.validateRequest(schema), ...handlers);
+    this.expressRouter.put(
+      path,
+      this.validateRequest(schema),
+      ...middlewares,
+      ...handlers,
+    );
     return this;
   }
 
@@ -138,6 +165,7 @@ export class Router {
    * PATCH
    * @param path
    * @param schema
+   * @param middlewares
    * @param handlers
    */
   public patch<
@@ -151,10 +179,16 @@ export class Router {
   >(
     path: string,
     schema: Schema,
+    middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
     this.registerRoute({ schema, path, method: 'patch' });
-    this.expressRouter.patch(path, this.validateRequest(schema), ...handlers);
+    this.expressRouter.patch(
+      path,
+      this.validateRequest(schema),
+      ...middlewares,
+      ...handlers,
+    );
     return this;
   }
 
@@ -162,6 +196,7 @@ export class Router {
    * DELETE
    * @param path
    * @param schema
+   * @param middlewares
    * @param handlers
    */
   public delete<
@@ -175,10 +210,16 @@ export class Router {
   >(
     path: string,
     schema: Schema,
+    middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
     this.registerRoute({ schema, path, method: 'delete' });
-    this.expressRouter.delete(path, this.validateRequest(schema), ...handlers);
+    this.expressRouter.delete(
+      path,
+      this.validateRequest(schema),
+      ...middlewares,
+      ...handlers,
+    );
     return this;
   }
 
@@ -186,6 +227,7 @@ export class Router {
    * OPTIONS
    * @param path
    * @param schema
+   * @param middlewares
    * @param handlers
    */
   public options<
@@ -199,10 +241,16 @@ export class Router {
   >(
     path: string,
     schema: Schema,
+    middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
     this.registerRoute({ schema, path, method: 'options' });
-    this.expressRouter.options(path, this.validateRequest(schema), ...handlers);
+    this.expressRouter.options(
+      path,
+      this.validateRequest(schema),
+      ...middlewares,
+      ...handlers,
+    );
     return this;
   }
 
@@ -210,6 +258,7 @@ export class Router {
    * HEAD
    * @param path
    * @param schema
+   * @param middlewares
    * @param handlers
    */
   public head<
@@ -223,10 +272,16 @@ export class Router {
   >(
     path: string,
     schema: Schema,
+    middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
     this.registerRoute({ schema, path, method: 'head' });
-    this.expressRouter.head(path, this.validateRequest(schema), ...handlers);
+    this.expressRouter.head(
+      path,
+      this.validateRequest(schema),
+      ...middlewares,
+      ...handlers,
+    );
     return this;
   }
 
@@ -234,6 +289,7 @@ export class Router {
    * TRACE
    * @param path
    * @param schema
+   * @param middlewares
    * @param handlers
    */
   public trace<
@@ -247,10 +303,17 @@ export class Router {
   >(
     path: string,
     schema: Schema,
+    middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
     this.registerRoute({ schema, path, method: 'trace' });
-    this.expressRouter.trace(path, this.validateRequest(schema), ...handlers);
+
+    this.expressRouter.trace(
+      path,
+      this.validateRequest(schema),
+      ...middlewares,
+      ...handlers,
+    );
     return this;
   }
 }
