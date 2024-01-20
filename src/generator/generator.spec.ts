@@ -16,9 +16,7 @@ describe('generator', () => {
   router.get(
     '/v1/pets',
     {
-      request: {
-        query: zod.object({ name: zod.string() }),
-      },
+      query: zod.object({ name: zod.string() }),
       responses: {
         200: {
           description: 'Returns all pets',
@@ -35,9 +33,7 @@ describe('generator', () => {
   router.get(
     '/v1/pets/:id',
     {
-      request: {
-        params: zod.object({ id: zod.string() }),
-      },
+      params: zod.object({ id: zod.string() }),
       responses: {
         200: {
           description: 'Returns a pet',
@@ -62,9 +58,7 @@ describe('generator', () => {
     '/v1/pets/',
     {
       operationId: 'Create a pet',
-      request: {
-        body: { applicationJson: PetSchema },
-      },
+      body: { applicationJson: PetSchema },
       responses: {
         200: {
           description: 'Returns a pet',
@@ -88,10 +82,9 @@ describe('generator', () => {
   router.put(
     '/v1/pets/:id/',
     {
-      request: {
-        params: zod.object({ id: zod.string() }),
-        body: { applicationJson: PetSchema },
-      },
+      params: zod.object({ id: zod.string() }),
+      body: { applicationJson: PetSchema },
+
       responses: {
         200: {
           description: 'Updated pet',
@@ -115,10 +108,8 @@ describe('generator', () => {
   router.delete(
     'v1/pets/:id',
     {
-      request: {
-        params: zod.object({ id: zod.string() }),
-        headers: zod.object({ Authorization: zod.string() }),
-      },
+      params: zod.object({ id: zod.string() }),
+      headers: zod.object({ Authorization: zod.string() }),
       responses: {
         201: {
           description: 'Deleted pet',
@@ -135,9 +126,7 @@ describe('generator', () => {
   router.post(
     'v1/pets/multipart',
     {
-      request: {
-        body: { multipartFormData: zod.object({ id: zod.string() }) },
-      },
+      body: { multipartFormData: zod.object({ id: zod.string() }) },
       responses: {
         201: {
           description: 'Post multipart pet',
@@ -154,9 +143,12 @@ describe('generator', () => {
   router.get(
     'v1/pets/content-type',
     {
-      request: {},
       responses: {
         200: {
+          description: 'get pets in different content type',
+          applicationJson: PetSchema,
+        },
+        400: {
           description: 'get pets in different content type',
           textPlain: zod.string(),
           applicationJson: PetSchema,
@@ -166,7 +158,7 @@ describe('generator', () => {
     },
     [],
     (req, res) => {
-      res.status(201).send('sabo');
+      res.status(200).send('sabo');
     },
   );
 
@@ -185,7 +177,6 @@ describe('generator', () => {
       },
       server,
     });
-    console.dir(spec, { depth: 100 });
     expect(spec.info.title).toBe(title);
     expect(spec.info.version).toBe(version);
     expect(spec.paths).toHaveProperty('/v1/pets');

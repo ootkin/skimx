@@ -65,7 +65,7 @@ describe('Router', () => {
       const router = new Router().get(
         '/params/:id',
         {
-          request: { params: z.object({ id: z.string() }) },
+          params: z.object({ id: z.string() }),
           responses: {
             200: {
               description: '',
@@ -101,7 +101,7 @@ describe('Router', () => {
       const router = new Router().get(
         '/query',
         {
-          request: { query: z.object({ id: z.string() }) },
+          query: z.object({ id: z.string() }),
           responses: {
             200: {
               description: '',
@@ -134,13 +134,11 @@ describe('Router', () => {
       const router = new Router().post(
         '/body',
         {
-          request: {
-            body: { applicationJson: z.object({ id: z.string() }) },
-          },
+          body: { applicationJson: z.object({ id: z.string() }) },
           responses: {
             200: {
               description: '',
-              applicationJson: z.object({}),
+              applicationJson: z.object({ id: z.string() }),
             },
           },
         },
@@ -197,9 +195,7 @@ describe('Router', () => {
       const router = new Router().post(
         '/body',
         {
-          request: {
-            body: { applicationJson: schema },
-          },
+          body: { applicationJson: schema },
           responses: {
             200: {
               description: '',
@@ -239,9 +235,7 @@ describe('Router', () => {
       const router = new Router().get(
         '/:id',
         {
-          request: {
-            params: schema,
-          },
+          params: schema,
           responses: {
             200: {
               description: '',
@@ -281,9 +275,7 @@ describe('Router', () => {
       const router = new Router().get(
         '/query',
         {
-          request: {
-            query: schema,
-          },
+          query: schema,
           responses: {
             200: {
               description: '',
