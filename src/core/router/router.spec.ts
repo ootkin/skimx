@@ -69,7 +69,7 @@ describe('Router', () => {
           responses: {
             200: {
               description: '',
-              'application/json': z.object({ id: z.string() }),
+              applicationJson: z.object({ id: z.string() }),
             },
           },
         },
@@ -105,7 +105,7 @@ describe('Router', () => {
           responses: {
             200: {
               description: '',
-              'application/json': z.object({ id: z.string() }),
+              applicationJson: z.object({ id: z.string() }),
             },
           },
         },
@@ -135,12 +135,12 @@ describe('Router', () => {
         '/body',
         {
           request: {
-            body: { 'application/json': z.object({ id: z.string() }) },
+            body: { applicationJson: z.object({ id: z.string() }) },
           },
           responses: {
             200: {
               description: '',
-              'application/json': z.object({}),
+              applicationJson: z.object({}),
             },
           },
         },
@@ -198,12 +198,12 @@ describe('Router', () => {
         '/body',
         {
           request: {
-            body: { 'application/json': schema },
+            body: { applicationJson: schema },
           },
           responses: {
             200: {
               description: '',
-              'application/json': schema,
+              applicationJson: schema,
             },
           },
         },
@@ -245,7 +245,7 @@ describe('Router', () => {
           responses: {
             200: {
               description: '',
-              schema,
+              applicationJson: schema,
             },
           },
         },
@@ -287,7 +287,7 @@ describe('Router', () => {
           responses: {
             200: {
               description: '',
-              schema,
+              applicationJson: schema,
             },
           },
         },

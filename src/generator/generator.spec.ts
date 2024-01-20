@@ -22,7 +22,7 @@ describe('generator', () => {
       responses: {
         200: {
           description: 'Returns all pets',
-          'application/json': PetSchema,
+          applicationJson: PetSchema,
         },
       },
     },
@@ -41,11 +41,11 @@ describe('generator', () => {
       responses: {
         200: {
           description: 'Returns a pet',
-          'application/json': PetSchema,
+          applicationJson: PetSchema,
         },
         404: {
           description: 'Pet not found',
-          'application/json': zod.object({
+          applicationJson: zod.object({
             status: zod.number(),
             message: zod.string(),
           }),
@@ -63,16 +63,16 @@ describe('generator', () => {
     {
       operationId: 'Create a pet',
       request: {
-        body: { 'application/json': PetSchema },
+        body: { applicationJson: PetSchema },
       },
       responses: {
         200: {
           description: 'Returns a pet',
-          'application/json': PetSchema,
+          applicationJson: PetSchema,
         },
         400: {
           description: 'Bad request',
-          'application/json': zod.object({
+          applicationJson: zod.object({
             status: zod.number(),
             message: zod.string(),
           }),
@@ -90,16 +90,16 @@ describe('generator', () => {
     {
       request: {
         params: zod.object({ id: zod.string() }),
-        body: { 'application/json': PetSchema },
+        body: { applicationJson: PetSchema },
       },
       responses: {
         200: {
           description: 'Updated pet',
-          'application/json': PetSchema,
+          applicationJson: PetSchema,
         },
         400: {
           description: 'Bad request',
-          'application/json': zod.object({
+          applicationJson: zod.object({
             status: zod.number(),
             message: zod.string(),
           }),
@@ -136,12 +136,12 @@ describe('generator', () => {
     'v1/pets/multipart',
     {
       request: {
-        body: { 'multipart/form-data': zod.object({ id: zod.string() }) },
+        body: { multipartFormData: zod.object({ id: zod.string() }) },
       },
       responses: {
         201: {
           description: 'Post multipart pet',
-          'application/json': PetSchema,
+          applicationJson: PetSchema,
         },
       },
     },
@@ -152,13 +152,15 @@ describe('generator', () => {
   );
 
   router.get(
-    'v1/pets/text',
+    'v1/pets/content-type',
     {
       request: {},
       responses: {
         200: {
-          description: 'get pets in text/plain',
-          'text/plain': zod.string(),
+          description: 'get pets in different content type',
+          textPlain: zod.string(),
+          applicationJson: PetSchema,
+          textHtml: zod.string(),
         },
       },
     },

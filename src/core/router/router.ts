@@ -33,10 +33,8 @@ export class Router {
   private validateRequest = (schema: RouteSchema) => {
     return (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
       const bodySchema =
-        schema.request?.body?.['application/json'] ||
-        schema.request?.body?.['multipart/form-data'] ||
-        schema.request?.body?.['text/plain'] ||
-        schema.request?.body?.['text/html'];
+        schema.request?.body?.applicationJson ||
+        schema.request?.body?.multipartFormData;
 
       const paramsSchema = schema.request?.params;
       const querySchema = schema.request?.query;
@@ -84,7 +82,7 @@ export class Router {
     ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
-    schema: Schema,
+    schema: Pick<Schema, keyof RouteSchema>,
     middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
