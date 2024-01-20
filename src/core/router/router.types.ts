@@ -2,30 +2,34 @@ import * as z from 'zod';
 import * as core from 'express-serve-static-core';
 import { ZodType } from '../../zod';
 
-interface ContentType {
-  'application/json'?: ZodType<unknown>;
-  'multipart/form-data'?: ZodType<unknown>;
-  'text/plain'?: ZodType<string>;
-  'text/html'?: ZodType<string>;
+interface ResponseContentType {
+  applicationJson?: ZodType<unknown>;
+  textPlain?: ZodType<string>;
+  textHtml?: ZodType<string>;
+}
+
+interface RequestContentType {
+  applicationJson?: ZodType<unknown>;
+  multipartFormData?: ZodType<unknown>;
 }
 
 interface ApplicationJson {
-  'application/json': ZodType<unknown>;
+  applicationJson: ZodType<unknown>;
 }
 
 interface MultipartFormData {
-  'multipart/form-data': ZodType<unknown>;
+  multipartFormData: ZodType<unknown>;
 }
 
 interface TextPlain {
-  'text/plain': ZodType<string>;
+  textPlain: ZodType<string>;
 }
 
 interface TextHtml {
-  'text/html': ZodType<string>;
+  textHtml: ZodType<string>;
 }
 
-interface Response extends ContentType {
+interface Response extends ResponseContentType {
   description: string;
 }
 
@@ -36,7 +40,7 @@ export type RouteSchema = {
     query?: ZodType<unknown>;
     params?: ZodType<unknown>;
     headers?: ZodType<unknown>;
-    body?: ContentType;
+    body?: RequestContentType;
   };
   responses: {
     [status: number]: Response;
@@ -62,27 +66,21 @@ export type RequestBody<
   S extends RouteSchema,
   R extends RouteRequest<S>,
 > = R extends { body: ApplicationJson }
-  ? z.infer<R['body']['application/json']>
+  ? z.infer<R['body']['applicationJson']>
   : R extends { body: MultipartFormData }
-    ? z.infer<R['body']['multipart/form-data']>
-    : R extends { body: TextPlain }
-      ? z.infer<R['body']['text/plain']>
-      : R extends { body: TextHtml }
-        ? z.infer<R['body']['text/html']>
-        : unknown;
+    ? z.infer<R['body']['multipartFormData']>
+    : unknown;
 
 export type ResponseBody<
   S extends RouteSchema,
   R extends RouteResponses<S>,
 > = R[keyof R] extends ApplicationJson
-  ? z.infer<R[keyof R]['application/json']>
-  : R[keyof R] extends MultipartFormData
-    ? z.infer<R[keyof R]['multipart/form-data']>
-    : R[keyof R] extends TextPlain
-      ? z.infer<R[keyof R]['text/plain']>
-      : R[keyof R] extends TextHtml
-        ? z.infer<R[keyof R]['text/html']>
-        : unknown;
+  ? z.infer<R[keyof R]['applicationJson']>
+  : R[keyof R] extends TextPlain
+    ? z.infer<R[keyof R]['textPlain']>
+    : R[keyof R] extends TextHtml
+      ? z.infer<R[keyof R]['textHtml']>
+      : unknown;
 
 export type RouterRoute = {
   schema: RouteSchema;

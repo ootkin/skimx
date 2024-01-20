@@ -36,17 +36,14 @@ function generateResponses(
     responses[status as `${1 | 2 | 3 | 4 | 5}${string}`] = {
       description,
       content: {
-        ...(rest['application/json'] && {
-          'application/json': { schema: rest['application/json'] },
+        ...(rest.applicationJson && {
+          'application/json': { schema: rest.applicationJson },
         }),
-        ...(rest['multipart/form-data'] && {
-          'multipart/form-data': { schema: rest['multipart/form-data'] },
+        ...(rest.textPlain && {
+          'text/plain': { schema: rest.textPlain },
         }),
-        ...(rest['text/plain'] && {
-          'text/plain': { schema: rest['text/plain'] },
-        }),
-        ...(rest['text/html'] && {
-          'text/html': { schema: rest['text/html'] },
+        ...(rest.textHtml && {
+          'text/html': { schema: rest.textHtml },
         }),
       },
     };
@@ -71,36 +68,18 @@ function generateRequestParams(schema: RouteSchema): ZodOpenApiParameters {
 function generateRequestBody(
   schema: RouteSchema,
 ): ZodOpenApiRequestBodyObject | undefined {
-  if (schema.request?.body && schema.request.body['application/json']) {
+  if (schema.request?.body && schema.request.body.applicationJson) {
     return {
       content: {
-        'application/json': { schema: schema.request.body['application/json'] },
+        'application/json': { schema: schema.request.body.applicationJson },
       },
     };
   }
-  if (schema.request?.body && schema.request.body['multipart/form-data']) {
+  if (schema.request?.body && schema.request.body.multipartFormData) {
     return {
       content: {
         'multipart/form-data': {
-          schema: schema.request.body['multipart/form-data'],
-        },
-      },
-    };
-  }
-  if (schema.request?.body && schema.request.body['text/plain']) {
-    return {
-      content: {
-        'text/plain': {
-          schema: schema.request.body['text/plain'],
-        },
-      },
-    };
-  }
-  if (schema.request?.body && schema.request.body['text/html']) {
-    return {
-      content: {
-        'text/html': {
-          schema: schema.request.body['text/html'],
+          schema: schema.request.body.multipartFormData,
         },
       },
     };
