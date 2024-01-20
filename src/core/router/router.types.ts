@@ -95,3 +95,7 @@ export type RouterRoute = {
     | 'patch'
     | 'trace';
 };
+
+export type StrictSchema<T extends RouteSchema> = {
+  [K in keyof T]: K extends keyof RouteSchema ? T[K] : never;
+};

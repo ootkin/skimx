@@ -14,8 +14,9 @@ import {
   ResponseBody,
   RouterRoute,
   RouteResponses,
+  StrictSchema,
 } from './router.types';
-import { ZodSchema, z, ZodType } from 'zod';
+import { ZodSchema } from 'zod';
 
 /**
  * A wrapper around the express Router
@@ -82,7 +83,7 @@ export class Router {
     ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
-    schema: Pick<Schema, keyof RouteSchema>,
+    schema: StrictSchema<Schema>,
     middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
@@ -114,7 +115,7 @@ export class Router {
     ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
-    schema: Schema,
+    schema: StrictSchema<Schema>,
     middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
@@ -145,7 +146,7 @@ export class Router {
     ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
-    schema: Schema,
+    schema: StrictSchema<Schema>,
     middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
@@ -176,7 +177,7 @@ export class Router {
     ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
-    schema: Schema,
+    schema: StrictSchema<Schema>,
     middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
@@ -207,7 +208,7 @@ export class Router {
     ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
-    schema: Schema,
+    schema: StrictSchema<Schema>,
     middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
@@ -238,7 +239,7 @@ export class Router {
     ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
-    schema: Schema,
+    schema: StrictSchema<Schema>,
     middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
@@ -269,7 +270,7 @@ export class Router {
     ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
-    schema: Schema,
+    schema: StrictSchema<Schema>,
     middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {
@@ -300,7 +301,7 @@ export class Router {
     ResBody extends ResponseBody<Schema, Res>,
   >(
     path: string,
-    schema: Schema,
+    schema: StrictSchema<Schema>,
     middlewares: RequestHandler[],
     ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
   ) {

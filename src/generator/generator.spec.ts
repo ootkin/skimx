@@ -122,7 +122,7 @@ describe('generator', () => {
       responses: {
         201: {
           description: 'Deleted pet',
-          'application/json': PetSchema,
+          applicationJson: PetSchema,
         },
       },
     },
