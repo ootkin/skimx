@@ -1,14 +1,8 @@
 import * as z from 'zod';
 import * as core from 'express-serve-static-core';
 import { ZodType } from '../../zod';
-import { Locals, RequestHandler, Response as ExpResponse } from 'express';
-import { ParsedQs } from 'qs';
-import {
-  NextFunction,
-  ParamsDictionary,
-  Request,
-  Response,
-} from 'express-serve-static-core';
+import { RequestHandler } from 'express';
+import { oas30, oas31 } from 'zod-openapi/lib-types/openapi3-ts/dist';
 
 interface RequestContentType {
   applicationJson?: ZodType;
@@ -34,15 +28,17 @@ interface RouteSchemaResponse {
   textHtml?: ZodType<string>;
 }
 
-export type RouteSchema = {
-  summary?: string;
-  operationId?: string;
+export interface RouteSchema
+  extends Omit<
+    oas31.OperationObject & oas30.OperationObject,
+    'requestBody' | 'responses' | 'parameters'
+  > {
   query?: ZodType;
   params?: ZodType;
   headers?: ZodType;
   body?: RequestContentType;
   responses: RouteSchemaResponses;
-};
+}
 
 export type RequestParams<S extends RouteSchema> = S extends { params: ZodType }
   ? z.infer<S['params']>
@@ -60,30 +56,7 @@ export type RequestBody<S extends RouteSchema> = S extends {
     ? z.infer<S['body']['multipartFormData']>
     : unknown;
 
-// export type ResponseBody<S extends RouteSchema> =
-//   S['responses'][keyof S['responses']] extends ApplicationJson
-//     ? z.infer<S['responses'][keyof S['responses']]['applicationJson']>
-//     : S['responses'][keyof S['responses']] extends TextPlain
-//       ? z.infer<S['responses'][keyof S['responses']]['textPlain']>
-//       : S['responses'][keyof S['responses']] extends TextHtml
-//         ? z.infer<S['responses'][keyof S['responses']]['textHtml']>
-//         : unknown;
-
-// export type ResponseBody<S extends RouteSchema> =
-//   S['responses'] extends RouteSchemaResponses
-//     ? S['responses'][number] extends RouteSchemaResponse
-//       ? S['responses'][number] extends ApplicationJson
-//         ? z.infer<S['responses'][number]['applicationJson']>
-//         : S['responses'][number] extends TextPlain
-//           ? z.infer<S['responses'][number]['textPlain']>
-//           : S['responses'][number] extends TextHtml
-//             ? z.infer<S['responses'][number]['textHtml']>
-//             : { 1: string }
-//       : { 2: string }
-//     : { 3: string };
-
 const zodUndefined = z.undefined();
-
 export type ResponseBody<S extends RouteSchema> =
   S['responses'] extends RouteSchemaResponses
     ? S['responses'][keyof S['responses']] extends RouteSchemaResponse
