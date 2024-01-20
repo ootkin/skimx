@@ -9,8 +9,13 @@ import {
 import { Server } from '../core';
 import { RouteSchema } from '../core/router/router.types';
 import { AnyZodObject } from 'zod';
+import { writeFileSync } from 'fs';
+import yaml from 'yaml';
 
-interface OpenApiObject extends Omit<ZodOpenApiObject, 'path' | 'openapi'> {}
+interface Options {
+  schema: Omit<ZodOpenApiObject, 'path' | 'openapi'>;
+  server: Server;
+}
 
 /**
  * Translate express path into OpenApi path
@@ -99,23 +104,40 @@ function generatePaths(server: Server): ZodOpenApiPathsObject {
     const requestBody = generateRequestBody(schema);
     const responses = generateResponses(schema);
 
+    delete schema.body;
+    delete schema.query;
+    delete schema.params;
+    delete schema.headers;
+    schema.responses = [];
+
     paths[pathKey][method] = {
+      ...schema,
       ...(requestParams && { requestParams }),
       ...(requestBody && { requestBody }),
       ...(responses && { responses }),
-      ...(schema.operationId && { operationId: schema.operationId }),
     };
   }
   return paths;
 }
 
-export default function generateSpec(args: {
-  schema: OpenApiObject;
-  server: Server;
-}) {
+export function generate(options: Options) {
   return createDocument({
-    ...args.schema,
+    ...options.schema,
     openapi: '3.1.0',
-    paths: generatePaths(args.server),
+    paths: generatePaths(options.server),
   });
+}
+
+export function write(
+  options: Options & { filename: string; format: 'json' | 'yaml' },
+) {
+  const { filename, format, ...rest } = options;
+  const spec = generate(rest);
+
+  const content =
+    format === 'json'
+      ? JSON.stringify(spec, null, 2)
+      : yaml.stringify(spec, null, 2);
+
+  writeFileSync(filename, content);
 }

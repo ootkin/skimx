@@ -1,7 +1,6 @@
 import { Router, Server } from '../core';
 import zod from '../zod';
-import express from 'express';
-import generateSpec from './generator';
+import { generate } from './generator';
 
 describe('generator', () => {
   const server = new Server();
@@ -17,6 +16,7 @@ describe('generator', () => {
     '/v1/pets',
     {
       query: zod.object({ name: zod.string() }),
+      tags: ['pet'],
       responses: {
         200: {
           description: 'Returns all pets',
@@ -168,7 +168,7 @@ describe('generator', () => {
     const title = 'Pet store';
     const version = '1.0.0';
 
-    const spec = generateSpec({
+    const spec = generate({
       schema: {
         info: {
           title,
@@ -177,6 +177,8 @@ describe('generator', () => {
       },
       server,
     });
+
+    console.dir(spec, { depth: 100 });
     expect(spec.info.title).toBe(title);
     expect(spec.info.version).toBe(version);
     expect(spec.paths).toHaveProperty('/v1/pets');
