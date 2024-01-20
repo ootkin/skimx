@@ -8,7 +8,7 @@ import {
 } from 'zod-openapi';
 import { Server } from '../core';
 import { RouteSchema } from '../core/router/router.types';
-import { AnyZodObject } from '../zod';
+import { AnyZodObject } from 'zod';
 
 interface OpenApiObject extends Omit<ZodOpenApiObject, 'path' | 'openapi'> {}
 
@@ -53,14 +53,14 @@ function generateResponses(
 
 function generateRequestParams(schema: RouteSchema): ZodOpenApiParameters {
   const requestParams: ZodOpenApiParameters = {};
-  if (schema.request?.params) {
-    requestParams.path = schema.request.params as AnyZodObject;
+  if (schema?.params) {
+    requestParams.path = schema.params as AnyZodObject;
   }
-  if (schema.request?.query) {
-    requestParams.query = schema.request.query as AnyZodObject;
+  if (schema?.query) {
+    requestParams.query = schema.query as AnyZodObject;
   }
-  if (schema.request?.headers) {
-    requestParams.header = schema.request.headers as AnyZodObject;
+  if (schema?.headers) {
+    requestParams.header = schema.headers as AnyZodObject;
   }
   return requestParams;
 }
@@ -68,18 +68,18 @@ function generateRequestParams(schema: RouteSchema): ZodOpenApiParameters {
 function generateRequestBody(
   schema: RouteSchema,
 ): ZodOpenApiRequestBodyObject | undefined {
-  if (schema.request?.body && schema.request.body.applicationJson) {
+  if (schema?.body && schema.body.applicationJson) {
     return {
       content: {
-        'application/json': { schema: schema.request.body.applicationJson },
+        'application/json': { schema: schema.body.applicationJson },
       },
     };
   }
-  if (schema.request?.body && schema.request.body.multipartFormData) {
+  if (schema?.body && schema.body.multipartFormData) {
     return {
       content: {
         'multipart/form-data': {
-          schema: schema.request.body.multipartFormData,
+          schema: schema.body.multipartFormData,
         },
       },
     };

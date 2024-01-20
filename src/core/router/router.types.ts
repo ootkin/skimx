@@ -1,86 +1,110 @@
 import * as z from 'zod';
 import * as core from 'express-serve-static-core';
 import { ZodType } from '../../zod';
-
-interface ResponseContentType {
-  applicationJson?: ZodType<unknown>;
-  textPlain?: ZodType<string>;
-  textHtml?: ZodType<string>;
-}
+import { Locals, RequestHandler, Response as ExpResponse } from 'express';
+import { ParsedQs } from 'qs';
+import {
+  NextFunction,
+  ParamsDictionary,
+  Request,
+  Response,
+} from 'express-serve-static-core';
 
 interface RequestContentType {
-  applicationJson?: ZodType<unknown>;
-  multipartFormData?: ZodType<unknown>;
+  applicationJson?: ZodType;
+  multipartFormData?: ZodType;
 }
 
 interface ApplicationJson {
-  applicationJson: ZodType<unknown>;
+  applicationJson: ZodType;
 }
 
 interface MultipartFormData {
-  multipartFormData: ZodType<unknown>;
+  multipartFormData: ZodType;
 }
 
-interface TextPlain {
-  textPlain: ZodType<string>;
-}
+type RouteSchemaResponses = {
+  [status: number]: RouteSchemaResponse;
+};
 
-interface TextHtml {
-  textHtml: ZodType<string>;
-}
-
-interface Response extends ResponseContentType {
+interface RouteSchemaResponse {
   description: string;
+  applicationJson?: ZodType;
+  textPlain?: ZodType<string>;
+  textHtml?: ZodType<string>;
 }
 
 export type RouteSchema = {
   summary?: string;
   operationId?: string;
-  request?: {
-    query?: ZodType<unknown>;
-    params?: ZodType<unknown>;
-    headers?: ZodType<unknown>;
-    body?: RequestContentType;
-  };
-  responses: {
-    [status: number]: Response;
-  };
+  query?: ZodType;
+  params?: ZodType;
+  headers?: ZodType;
+  body?: RequestContentType;
+  responses: RouteSchemaResponses;
 };
 
-export type RouteRequest<S extends RouteSchema> = S['request'];
-export type RouteResponses<S extends RouteSchema> = S['responses'];
-
-export type RequestParams<
-  S extends RouteSchema,
-  R extends RouteRequest<S>,
-> = R extends { params: ZodType<unknown> }
-  ? z.infer<R['params']>
+export type RequestParams<S extends RouteSchema> = S extends { params: ZodType }
+  ? z.infer<S['params']>
   : core.ParamsDictionary;
 
-export type RequestQuery<
-  S extends RouteSchema,
-  R extends RouteRequest<S>,
-> = R extends { query: ZodType<unknown> } ? z.infer<R['query']> : core.Query;
+export type RequestQuery<S extends RouteSchema> = S extends { query: ZodType }
+  ? z.infer<S['query']>
+  : core.Query;
 
-export type RequestBody<
-  S extends RouteSchema,
-  R extends RouteRequest<S>,
-> = R extends { body: ApplicationJson }
-  ? z.infer<R['body']['applicationJson']>
-  : R extends { body: MultipartFormData }
-    ? z.infer<R['body']['multipartFormData']>
+export type RequestBody<S extends RouteSchema> = S extends {
+  body: ApplicationJson;
+}
+  ? z.infer<S['body']['applicationJson']>
+  : S extends { body: MultipartFormData }
+    ? z.infer<S['body']['multipartFormData']>
     : unknown;
 
-export type ResponseBody<
-  S extends RouteSchema,
-  R extends RouteResponses<S>,
-> = R[keyof R] extends ApplicationJson
-  ? z.infer<R[keyof R]['applicationJson']>
-  : R[keyof R] extends TextPlain
-    ? z.infer<R[keyof R]['textPlain']>
-    : R[keyof R] extends TextHtml
-      ? z.infer<R[keyof R]['textHtml']>
-      : unknown;
+// export type ResponseBody<S extends RouteSchema> =
+//   S['responses'][keyof S['responses']] extends ApplicationJson
+//     ? z.infer<S['responses'][keyof S['responses']]['applicationJson']>
+//     : S['responses'][keyof S['responses']] extends TextPlain
+//       ? z.infer<S['responses'][keyof S['responses']]['textPlain']>
+//       : S['responses'][keyof S['responses']] extends TextHtml
+//         ? z.infer<S['responses'][keyof S['responses']]['textHtml']>
+//         : unknown;
+
+// export type ResponseBody<S extends RouteSchema> =
+//   S['responses'] extends RouteSchemaResponses
+//     ? S['responses'][number] extends RouteSchemaResponse
+//       ? S['responses'][number] extends ApplicationJson
+//         ? z.infer<S['responses'][number]['applicationJson']>
+//         : S['responses'][number] extends TextPlain
+//           ? z.infer<S['responses'][number]['textPlain']>
+//           : S['responses'][number] extends TextHtml
+//             ? z.infer<S['responses'][number]['textHtml']>
+//             : { 1: string }
+//       : { 2: string }
+//     : { 3: string };
+
+const zodUndefined = z.undefined();
+
+export type ResponseBody<S extends RouteSchema> =
+  S['responses'] extends RouteSchemaResponses
+    ? S['responses'][keyof S['responses']] extends RouteSchemaResponse
+      ? S['responses'][keyof S['responses']][
+          | 'applicationJson'
+          | 'textPlain'
+          | 'textHtml'] extends ZodType
+        ? z.infer<
+            | (S['responses'][keyof S['responses']]['applicationJson'] extends ZodType
+                ? S['responses'][keyof S['responses']]['applicationJson']
+                : typeof zodUndefined)
+            | (S['responses'][keyof S['responses']]['textPlain'] extends ZodType
+                ? S['responses'][keyof S['responses']]['textPlain']
+                : typeof zodUndefined)
+            | (S['responses'][keyof S['responses']]['textHtml'] extends ZodType
+                ? S['responses'][keyof S['responses']]['textHtml']
+                : typeof zodUndefined)
+          >
+        : unknown
+      : unknown
+    : unknown;
 
 export type RouterRoute = {
   schema: RouteSchema;
@@ -96,6 +120,13 @@ export type RouterRoute = {
     | 'trace';
 };
 
-export type StrictSchema<T extends RouteSchema> = {
-  [K in keyof T]: K extends keyof RouteSchema ? T[K] : never;
+export type SelectSubset<T> = {
+  [key in keyof T]: key extends keyof RouteSchema ? T[key] : never;
 };
+
+export type RouteHandler<Schema extends RouteSchema> = RequestHandler<
+  RequestParams<Schema>,
+  ResponseBody<Schema>,
+  RequestBody<Schema>,
+  RequestQuery<Schema>
+>;

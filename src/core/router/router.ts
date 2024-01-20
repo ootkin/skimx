@@ -6,15 +6,10 @@ import {
   NextFunction,
 } from 'express';
 import {
-  RouteRequest,
-  RequestBody,
-  RequestParams,
-  RequestQuery,
   RouteSchema,
-  ResponseBody,
   RouterRoute,
-  RouteResponses,
-  StrictSchema,
+  SelectSubset,
+  RouteHandler,
 } from './router.types';
 import { ZodSchema } from 'zod';
 
@@ -34,21 +29,18 @@ export class Router {
   private validateRequest = (schema: RouteSchema) => {
     return (req: ExpressRequest, res: ExpressResponse, next: NextFunction) => {
       const bodySchema =
-        schema.request?.body?.applicationJson ||
-        schema.request?.body?.multipartFormData;
+        schema.body?.applicationJson || schema.body?.multipartFormData;
 
-      const paramsSchema = schema.request?.params;
-      const querySchema = schema.request?.query;
+      const paramsSchema = schema.params;
+      const querySchema = schema.query;
 
       if (bodySchema instanceof ZodSchema) {
         req.body = bodySchema.parse(req.body);
       }
       if (paramsSchema instanceof ZodSchema) {
-        // @ts-expect-error we are use that the parsing is an object
         req.params = paramsSchema.parse(req.params);
       }
       if (querySchema instanceof ZodSchema) {
-        // @ts-expect-error we are use that the parsing is an object
         req.query = querySchema.parse(req.query);
       }
 
@@ -73,19 +65,11 @@ export class Router {
    * @param middlewares
    * @param handlers
    */
-  public get<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Res extends RouteResponses<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Res>,
-  >(
+  public get<Schema extends RouteSchema>(
     path: string,
-    schema: StrictSchema<Schema>,
+    schema: SelectSubset<Schema>,
     middlewares: RequestHandler[],
-    ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+    ...handlers: RouteHandler<Schema>[]
   ) {
     this.registerRoute({ schema, path, method: 'get' });
     this.expressRouter.get(
@@ -105,19 +89,11 @@ export class Router {
    * @param middlewares
    * @param handlers
    */
-  public post<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Res extends RouteResponses<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Res>,
-  >(
+  public post<Schema extends RouteSchema>(
     path: string,
-    schema: StrictSchema<Schema>,
+    schema: SelectSubset<Schema>,
     middlewares: RequestHandler[],
-    ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+    ...handlers: RouteHandler<Schema>[]
   ) {
     this.registerRoute({ schema, path, method: 'post' });
     this.expressRouter.post(
@@ -136,19 +112,12 @@ export class Router {
    * @param middlewares
    * @param handlers
    */
-  public put<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Res extends RouteResponses<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Res>,
-  >(
+
+  public put<Schema extends RouteSchema>(
     path: string,
-    schema: StrictSchema<Schema>,
+    schema: SelectSubset<Schema>,
     middlewares: RequestHandler[],
-    ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+    ...handlers: RouteHandler<Schema>[]
   ) {
     this.registerRoute({ schema, path, method: 'put' });
     this.expressRouter.put(
@@ -167,19 +136,11 @@ export class Router {
    * @param middlewares
    * @param handlers
    */
-  public patch<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Res extends RouteResponses<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Res>,
-  >(
+  public patch<Schema extends RouteSchema>(
     path: string,
-    schema: StrictSchema<Schema>,
+    schema: SelectSubset<Schema>,
     middlewares: RequestHandler[],
-    ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+    ...handlers: RouteHandler<Schema>[]
   ) {
     this.registerRoute({ schema, path, method: 'patch' });
     this.expressRouter.patch(
@@ -198,19 +159,11 @@ export class Router {
    * @param middlewares
    * @param handlers
    */
-  public delete<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Res extends RouteResponses<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Res>,
-  >(
+  public delete<Schema extends RouteSchema>(
     path: string,
-    schema: StrictSchema<Schema>,
+    schema: SelectSubset<Schema>,
     middlewares: RequestHandler[],
-    ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+    ...handlers: RouteHandler<Schema>[]
   ) {
     this.registerRoute({ schema, path, method: 'delete' });
     this.expressRouter.delete(
@@ -229,19 +182,11 @@ export class Router {
    * @param middlewares
    * @param handlers
    */
-  public options<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Res extends RouteResponses<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Res>,
-  >(
+  public options<Schema extends RouteSchema>(
     path: string,
-    schema: StrictSchema<Schema>,
+    schema: SelectSubset<Schema>,
     middlewares: RequestHandler[],
-    ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+    ...handlers: RouteHandler<Schema>[]
   ) {
     this.registerRoute({ schema, path, method: 'options' });
     this.expressRouter.options(
@@ -260,19 +205,11 @@ export class Router {
    * @param middlewares
    * @param handlers
    */
-  public head<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Res extends RouteResponses<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Res>,
-  >(
+  public head<Schema extends RouteSchema>(
     path: string,
-    schema: StrictSchema<Schema>,
+    schema: SelectSubset<Schema>,
     middlewares: RequestHandler[],
-    ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+    ...handlers: RouteHandler<Schema>[]
   ) {
     this.registerRoute({ schema, path, method: 'head' });
     this.expressRouter.head(
@@ -291,19 +228,11 @@ export class Router {
    * @param middlewares
    * @param handlers
    */
-  public trace<
-    Schema extends RouteSchema,
-    Req extends RouteRequest<Schema>,
-    Res extends RouteResponses<Schema>,
-    Params extends RequestParams<Schema, Req>,
-    Query extends RequestQuery<Schema, Req>,
-    ReqBody extends RequestBody<Schema, Req>,
-    ResBody extends ResponseBody<Schema, Res>,
-  >(
+  public trace<Schema extends RouteSchema>(
     path: string,
-    schema: StrictSchema<Schema>,
+    schema: SelectSubset<Schema>,
     middlewares: RequestHandler[],
-    ...handlers: RequestHandler<Params, ResBody, ReqBody, Query>[]
+    ...handlers: RouteHandler<Schema>[]
   ) {
     this.registerRoute({ schema, path, method: 'trace' });
 
