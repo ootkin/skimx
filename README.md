@@ -105,10 +105,11 @@ router.get(
     responses: {
       200: {
         description: 'A list of todos',
-        schema: z.array(TodoSchema),
+        applicationJson: z.array(TodoSchema),
       },
     },
   },
+  [], // middlewares
   async (req, res, next) => {
     const todos = await fetchTodos();
     res.status(200).json(todos);
@@ -121,6 +122,42 @@ The schema is an object that is used to:
 - infer `req.params`, `req.query` and `req.body` types using Zod (`z.infer`)
 - validates an incoming request using Zod schemas
 - generates an OpenAPI specification for each route
+
+#### Route middlewares and handlers
+
+Sometimes a middleware (for example for a third party package) expects as input a request that needs to satisfy
+the `Request` express type.
+
+If a route specify a request schema that does not satisfy the `Request` type, the typescript compiler gives you an error.
+
+That's why a route can take as input an array of middlewares, where they don't need an inferred request type from the specified schema.
+
+In this case, you have the flexibility to define handlers that needs to satisfy the `Request` object inside the middlewares array or you can specify them down below:
+
+```ts
+router.post(
+  '/',
+  {
+    request: {
+      query: {
+        // req.query type is inferred from this property
+        // req.query.id is a number
+        applicationJson: z.object({ id: z.coerce.number() }),
+      },
+    },
+  },
+  // express cors middleware does not expect that req.query args are numbers
+  [cors()],
+  // multiple handlers that expect req.query.id to be a number
+  (req, res, next) => {
+    console.log(req.query);
+    next();
+  },
+  (req, res, next) => {
+    res.json({});
+  },
+);
+```
 
 #### `.get()`
 
@@ -151,10 +188,11 @@ router.get(
     responses: {
       200: {
         description: 'A list of todos',
-        schema: z.array(TodoSchema),
+        applicationJson: z.array(TodoSchema),
       },
     },
   },
+  [], // middlewares
   (req, res, next) => {
     /* your code here */
   },
@@ -181,22 +219,23 @@ router.post(
   {
     request: {
       // Specify the schema for req.params
-      body: TodoSchema,
+      body: {
+        applicationJson: TodoSchema,
+      },
     },
     responses: {
       201: {
         description: 'The created todo',
-        schema: TodoSchema,
+        applicationJson: TodoSchema,
       },
     },
   },
+  [], // middlewares
   (req, res, next) => {
     /* your code here */
   },
 );
 ```
-
-SkimX supports all the methods that express supports (get, post, put, patch, delete, options, head, trace).
 
 ### `generateSpec`
 
@@ -228,10 +267,11 @@ router.get(
     responses: {
       200: {
         description: 'A list of todos',
-        schema: z.array(TodoSchema),
+        applicationJson: z.array(TodoSchema),
       },
     },
   },
+  [], // middlewares
   (req, res) => {
     /* your code*/
   },
