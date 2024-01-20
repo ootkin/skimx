@@ -17,7 +17,7 @@ npm install skimx
 Creates a Server that wraps an express instance
 
 ```ts
-import { Server } from 'skimx/core';
+import { Server } from 'skimx';
 
 const server = new Server();
 ```
@@ -53,7 +53,7 @@ server.use(errorHandler); // make sure that is is the last handler
 Attach a `Router` instance to the server.
 
 ```ts
-import { Server, Router } from 'skimx/core';
+import { Server, Router } from 'skimx';
 
 const server = new Server();
 const router1 = new Router();
@@ -88,9 +88,10 @@ server.close((error) => {
 
 Creates a Router that extends an express router with a schema.
 
+*Info*: The Zod `.openapi()` extension is used to attach information to Zod schema using [zod-openapi](https://github.com/samchungy/zod-openapi) library.
+
 ```ts
-import { Router } from 'skimx/core';
-import z from 'skimx/zod';
+import { Router, z } from 'skimx';
 
 const router = new Router();
 
@@ -160,8 +161,7 @@ router.post(
 Attach an endpoint with GET method to the router
 
 ```ts
-import { Router } from 'skimx/core';
-import z from 'skimx/zod';
+import { Router, z } from 'skimx';
 
 const router = new Router();
 
@@ -199,8 +199,7 @@ router.get(
 Attach an endpoint with POST method to the router
 
 ```ts
-import { Router } from 'skimx/core';
-import z from 'skimx/zod';
+import { Router, z } from 'skimx';
 
 const router = new Router();
 
@@ -230,116 +229,48 @@ router.post(
 );
 ```
 
-### `generateSpec`
+### `generate`
 
 Generate OpenAPI specification.
 
 ```ts
-import { Server, Router } from 'skimx/core';
-import generateSpec from 'skimx/generator';
-import z from 'skimx/zod';
-import { writeFileSync } from 'fs';
+import { Server, generate } from 'skimx';
 
 const server = new Server();
 
-const router = new Router();
-
-const TodoSchema = z.object({
-  id: z.number().openapi({ description: 'todo id', example: 1 }),
-  description: z
-    .string()
-    .openapi({ description: 'todo description', example: 'My first todo' }),
-});
-
-router.get(
-  '/v1/pets',
-  {
-    query: z.object({ name: z.string() }),
-    responses: {
-      200: {
-        description: 'A list of todos',
-        applicationJson: z.array(TodoSchema),
-      },
-    },
+const schema = {
+  info: {
+    title: 'my spec',
+    version: '1.0.0',
   },
-  [], // middlewares
-  (req, res) => {
-    /* your code*/
-  },
-);
-
-server.useRouters(router);
-
-const spec = generateSpec({
-  schema: {
-    info: {
-      title: 'my spec',
-      version: '1.0.0',
-    },
-  },
-  server,
-});
-
-writeFileSync('spec.json', JSON.stringify(spec, null, 2));
-```
-
-The code above generates a `spec.json` file in the root of the project:
-
-```json
-{
-  "info": {
-    "title": "my spec",
-    "version": "1.0.0"
-  },
-  "openapi": "3.1.0",
-  "paths": {
-    "/v1/pets": {
-      "get": {
-        "parameters": [
-          {
-            "in": "query",
-            "name": "name",
-            "schema": {
-              "type": "string"
-            },
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of todos",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "number",
-                        "description": "todo id",
-                        "example": 1
-                      },
-                      "description": {
-                        "type": "string",
-                        "description": "todo description",
-                        "example": "My first todo"
-                      }
-                    },
-                    "required": ["id", "description"]
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
 }
+
+// .....
+
+// Returns an object
+const spec = generateSpec({ schema, server });
 ```
 
-The Zod `.openapi()` extension is used to attach information to Zod schema using [zod-openapi](https://github.com/samchungy/zod-openapi) library.
+### `write`
+
+Generate and write the specification to a file:
+```ts
+import { Server, write } from 'skimx';
+
+const server = new Server();
+
+const schema = {
+  info: {
+    title: 'my spec',
+    version: '1.0.0',
+  },
+}
+
+// .....
+
+// Writes a file to the root of the project
+write({ schema, server, filename: 'openapi.yaml', format: 'yaml' })
+```
 
 ## Caveats
 
