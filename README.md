@@ -138,13 +138,9 @@ In this case, you have the flexibility to define handlers that needs to satisfy 
 router.post(
   '/',
   {
-    request: {
-      query: {
-        // req.query type is inferred from this property
-        // req.query.id is a number
-        applicationJson: z.object({ id: z.coerce.number() }),
-      },
-    },
+    // req.query type is inferred from this property
+    // req.query.id is a number
+    query: z.object({ id: z.coerce.number() }),
   },
   // express cors middleware does not expect that req.query args are numbers
   [cors()],
@@ -177,14 +173,13 @@ const TodoSchema = z.object({
 router.get(
   '/v1/todos/:param',
   {
-    request: {
-      // Specify the schema for req.params
-      params: z.object({ param: z.string() }),
-      // Specify the schema for req.query
-      query: z.object({ name: z.string() }),
-      // Specify the schema for req.headers
-      headers: z.object({ Authorization: z.string() }),
-    },
+    // Specify the schema for req.params
+    params: z.object({ param: z.string() }),
+    // Specify the schema for req.query
+    query: z.object({ name: z.string() }),
+    // Specify the schema for req.headers
+    headers: z.object({ Authorization: z.string() }),
+    // Specify the schema for response
     responses: {
       200: {
         description: 'A list of todos',
@@ -217,11 +212,9 @@ const TodoSchema = z.object({
 router.post(
   '/v1/todos/',
   {
-    request: {
-      // Specify the schema for req.params
-      body: {
-        applicationJson: TodoSchema,
-      },
+    // Specify the schema for req.params
+    body: {
+      applicationJson: TodoSchema,
     },
     responses: {
       201: {
@@ -261,9 +254,7 @@ const TodoSchema = z.object({
 router.get(
   '/v1/pets',
   {
-    request: {
-      query: z.object({ name: z.string() }),
-    },
+    query: z.object({ name: z.string() }),
     responses: {
       200: {
         description: 'A list of todos',
