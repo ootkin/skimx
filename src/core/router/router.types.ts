@@ -1,7 +1,7 @@
 import * as z from 'zod';
 import * as core from 'express-serve-static-core';
 import { ZodType } from '../../zod';
-import { RequestHandler } from 'express';
+import { NextFunction, RequestHandler } from 'express';
 import { oas30, oas31 } from 'zod-openapi/lib-types/openapi3-ts/dist';
 
 interface RequestContentType {
