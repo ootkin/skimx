@@ -88,7 +88,7 @@ server.close((error) => {
 
 Creates a Router that extends an express router with a schema.
 
-*Info*: The Zod `.openapi()` extension is used to attach information to Zod schema using [zod-openapi](https://github.com/samchungy/zod-openapi) library.
+_Info_: The Zod `.openapi()` extension is used to attach information to Zod schema using [zod-openapi](https://github.com/samchungy/zod-openapi) library.
 
 ```ts
 import { Router, z } from 'skimx';
@@ -243,7 +243,7 @@ const schema = {
     title: 'my spec',
     version: '1.0.0',
   },
-}
+};
 
 // .....
 
@@ -254,6 +254,7 @@ const spec = generateSpec({ schema, server });
 ### `write`
 
 Generate and write the specification to a file:
+
 ```ts
 import { Server, write } from 'skimx';
 
@@ -264,12 +265,12 @@ const schema = {
     title: 'my spec',
     version: '1.0.0',
   },
-}
+};
 
 // .....
 
 // Writes a file to the root of the project
-write({ schema, server, filename: 'openapi.yaml', format: 'yaml' })
+write({ schema, server, filename: 'openapi.yaml', format: 'yaml' });
 ```
 
 ## Caveats
