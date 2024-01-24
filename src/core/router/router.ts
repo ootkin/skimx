@@ -10,6 +10,10 @@ import {
   RouterRoute,
   SelectSubset,
   RouteHandler,
+  RequestParams,
+  ResponseBody,
+  RequestBody,
+  RequestQuery,
 } from './router.types';
 import { ZodSchema } from 'zod';
 
@@ -21,6 +25,91 @@ export class Router {
   public routes: RouterRoute[] = [];
 
   constructor() {}
+
+  /**
+   * Wrap a middleware to catch the async errors
+   * @param fn
+   * @private
+   */
+  private wrapMiddleware(
+    fn: (
+      req: ExpressRequest,
+      response: ExpressResponse,
+      next: NextFunction,
+    ) => Promise<void> | void,
+  ) {
+    return (req: ExpressRequest, res: ExpressResponse, next: NextFunction) =>
+      Promise.resolve(fn(req, res, next)).catch(next);
+  }
+
+  /**
+   * Wrap a handler to catch the async errors
+   * @param fn
+   * @private
+   */
+  private wrapHandler<Schema extends RouteSchema>(
+    fn: (
+      req: ExpressRequest<
+        RequestParams<Schema>,
+        ResponseBody<Schema>,
+        RequestBody<Schema>,
+        RequestQuery<Schema>
+      >,
+      res: ExpressResponse<ResponseBody<Schema>>,
+      next: NextFunction,
+    ) => Promise<void> | void,
+  ) {
+    return (
+      req: ExpressRequest<
+        RequestParams<Schema>,
+        ResponseBody<Schema>,
+        RequestBody<Schema>,
+        RequestQuery<Schema>
+      >,
+      res: ExpressResponse<ResponseBody<Schema>>,
+      next: NextFunction,
+    ) => Promise.resolve(fn(req, res, next)).catch(next);
+  }
+
+  /**
+   * Register route for oas specification
+   * @param method
+   * @param path
+   * @param schema
+   */
+  private registerRoute = ({ method, path, schema }: RouterRoute) => {
+    const exists = this.routes.find(
+      (r) => r.method === method && r.path === path,
+    );
+    if (exists) {
+      throw new Error(`${method} method already exists for path ${path}`);
+    }
+    this.routes.push({ method, path, schema });
+  };
+
+  /**
+   * Inject route
+   * @param path
+   * @param method
+   * @param schema
+   * @param middlewares
+   * @param handlers
+   * @private
+   */
+  private inject<Schema extends RouteSchema>(
+    path: string,
+    method: RouterRoute['method'],
+    schema: Schema,
+    middlewares: RequestHandler[],
+    ...handlers: RouteHandler<Schema>[]
+  ) {
+    this.registerRoute({ schema, path, method });
+    return [
+      this.validateRequest(schema),
+      ...middlewares.map((m) => this.wrapMiddleware(m)),
+      ...handlers.map((h) => this.wrapHandler<Schema>(h)),
+    ];
+  }
 
   /**
    * Validate the request using OAS
@@ -48,16 +137,6 @@ export class Router {
     };
   };
 
-  private registerRoute = ({ method, path, schema }: RouterRoute) => {
-    const exists = this.routes.find(
-      (r) => r.method === method && r.path === path,
-    );
-    if (exists) {
-      throw new Error(`${method} method already exists for path ${path}`);
-    }
-    this.routes.push({ method, path, schema });
-  };
-
   /**
    * GET
    * @param path
@@ -71,14 +150,10 @@ export class Router {
     middlewares: RequestHandler[],
     ...handlers: RouteHandler<Schema>[]
   ) {
-    this.registerRoute({ schema, path, method: 'get' });
     this.expressRouter.get(
       path,
-      this.validateRequest(schema),
-      ...middlewares,
-      ...handlers,
+      ...this.inject<Schema>(path, 'get', schema, middlewares, ...handlers),
     );
-
     return this;
   }
 
@@ -95,12 +170,9 @@ export class Router {
     middlewares: RequestHandler[],
     ...handlers: RouteHandler<Schema>[]
   ) {
-    this.registerRoute({ schema, path, method: 'post' });
     this.expressRouter.post(
       path,
-      this.validateRequest(schema),
-      ...middlewares,
-      ...handlers,
+      ...this.inject<Schema>(path, 'post', schema, middlewares, ...handlers),
     );
     return this;
   }
@@ -119,12 +191,9 @@ export class Router {
     middlewares: RequestHandler[],
     ...handlers: RouteHandler<Schema>[]
   ) {
-    this.registerRoute({ schema, path, method: 'put' });
     this.expressRouter.put(
       path,
-      this.validateRequest(schema),
-      ...middlewares,
-      ...handlers,
+      ...this.inject<Schema>(path, 'put', schema, middlewares, ...handlers),
     );
     return this;
   }
@@ -142,12 +211,9 @@ export class Router {
     middlewares: RequestHandler[],
     ...handlers: RouteHandler<Schema>[]
   ) {
-    this.registerRoute({ schema, path, method: 'patch' });
     this.expressRouter.patch(
       path,
-      this.validateRequest(schema),
-      ...middlewares,
-      ...handlers,
+      ...this.inject<Schema>(path, 'patch', schema, middlewares, ...handlers),
     );
     return this;
   }
@@ -165,12 +231,9 @@ export class Router {
     middlewares: RequestHandler[],
     ...handlers: RouteHandler<Schema>[]
   ) {
-    this.registerRoute({ schema, path, method: 'delete' });
     this.expressRouter.delete(
       path,
-      this.validateRequest(schema),
-      ...middlewares,
-      ...handlers,
+      ...this.inject<Schema>(path, 'delete', schema, middlewares, ...handlers),
     );
     return this;
   }
@@ -188,12 +251,9 @@ export class Router {
     middlewares: RequestHandler[],
     ...handlers: RouteHandler<Schema>[]
   ) {
-    this.registerRoute({ schema, path, method: 'options' });
     this.expressRouter.options(
       path,
-      this.validateRequest(schema),
-      ...middlewares,
-      ...handlers,
+      ...this.inject<Schema>(path, 'options', schema, middlewares, ...handlers),
     );
     return this;
   }
@@ -211,12 +271,9 @@ export class Router {
     middlewares: RequestHandler[],
     ...handlers: RouteHandler<Schema>[]
   ) {
-    this.registerRoute({ schema, path, method: 'head' });
     this.expressRouter.head(
       path,
-      this.validateRequest(schema),
-      ...middlewares,
-      ...handlers,
+      ...this.inject<Schema>(path, 'head', schema, middlewares, ...handlers),
     );
     return this;
   }
@@ -234,13 +291,9 @@ export class Router {
     middlewares: RequestHandler[],
     ...handlers: RouteHandler<Schema>[]
   ) {
-    this.registerRoute({ schema, path, method: 'trace' });
-
     this.expressRouter.trace(
       path,
-      this.validateRequest(schema),
-      ...middlewares,
-      ...handlers,
+      ...this.inject<Schema>(path, 'trace', schema, middlewares, ...handlers),
     );
     return this;
   }

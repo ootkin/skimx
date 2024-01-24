@@ -132,3 +132,6 @@ dist
 .idea
 .vscode
 spec.json
+openapi.yaml
+
+src/test.ts
