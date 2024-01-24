@@ -10,7 +10,7 @@ import { Server } from '../core';
 import { RouteSchema } from '../core/router/router.types';
 import { AnyZodObject } from 'zod';
 import { writeFileSync } from 'fs';
-import yaml from 'yaml';
+import yaml from 'js-yaml';
 
 interface Options {
   schema: Omit<ZodOpenApiObject, 'path' | 'openapi'>;
@@ -137,7 +137,7 @@ export function write(
   const content =
     format === 'json'
       ? JSON.stringify(spec, null, 2)
-      : yaml.stringify(spec, null, 2);
+      : yaml.dump(spec, { indent: 2 });
 
   writeFileSync(filename, content);
 }
