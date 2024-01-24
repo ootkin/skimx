@@ -276,7 +276,6 @@ write({ schema, server, filename: 'openapi.yaml', format: 'yaml' });
 ## Caveats
 
 - Right now SkimX supports only OpenAPI version 3.1.0
-- Right now SkimX supports only 'application/json' as content type
 
 ## Contributing
 
