@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/ootkin/skimx.git"
   },
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "SkimX streamlines web application development with OpenAPI schemas that validate and infer types, ensuring consistency between contracts and codebases.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
