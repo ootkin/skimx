@@ -4,21 +4,20 @@ layout: home
 
 hero:
   name: 'SkimX'
-  text: 'Create web applications using OpenAPI schemas'
-  tagline: My great project tagline
+  tagline: Streamlining Web Development with the Power of OpenAPI
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
+      text: Get Started
+      link: /introduction
     - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: View on GitHub
+      link: https://github.com/ootkin/skimx
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Consistency Enforcement
+    details: Maintains a single source of truth between API contracts and the codebase, ensuring that changes are consistently reflected.
+  - title: Data Validation
+    details: Utilizes zod with zod-openapi for validation, type inference, and OpenAPI specification generation.
+  - title: Built on top of Express.js
+    details: Leverages the power of Express.js for web server and API development, providing a familiar and efficient environment.
 ---

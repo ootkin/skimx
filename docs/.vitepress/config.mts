@@ -9,21 +9,21 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' },
+      { text: 'Introduction', link: '/introduction' },
     ],
-
     sidebar: [
       {
-        text: 'Examples',
         items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' },
+          { text: 'Introduction', link: '/introduction' },
+          { text: 'Examples', link: '/examples' },
+          { text: 'Generate OAS', link: '/generate-openapi-spec' },
+          { text: 'About', link: '/about' },
         ],
       },
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' },
+      { icon: 'github', link: 'https://github.com/ootkin/skimx' },
     ],
   },
 });
