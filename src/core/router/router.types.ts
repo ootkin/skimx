@@ -1,7 +1,7 @@
 import * as z from 'zod';
 import * as core from 'express-serve-static-core';
 import { ZodType } from '../../zod';
-import { NextFunction, RequestHandler } from 'express';
+import { RequestHandler } from 'express';
 import { oas30, oas31 } from 'zod-openapi/lib-types/openapi3-ts/dist';
 
 interface RequestContentType {
@@ -24,8 +24,9 @@ type RouteSchemaResponses = {
 interface RouteSchemaResponse {
   description: string;
   applicationJson?: ZodType;
-  textPlain?: ZodType<string>;
-  textHtml?: ZodType<string>;
+  textPlain?: ZodType;
+  textHtml?: ZodType;
+  applicationPdf?: ZodType;
 }
 
 export interface RouteSchema
@@ -63,7 +64,8 @@ export type ResponseBody<S extends RouteSchema> =
       ? S['responses'][keyof S['responses']][
           | 'applicationJson'
           | 'textPlain'
-          | 'textHtml'] extends ZodType
+          | 'textHtml'
+          | 'applicationPdf'] extends ZodType
         ? z.infer<
             | (S['responses'][keyof S['responses']]['applicationJson'] extends ZodType
                 ? S['responses'][keyof S['responses']]['applicationJson']
@@ -73,6 +75,9 @@ export type ResponseBody<S extends RouteSchema> =
                 : typeof zodUndefined)
             | (S['responses'][keyof S['responses']]['textHtml'] extends ZodType
                 ? S['responses'][keyof S['responses']]['textHtml']
+                : typeof zodUndefined)
+            | (S['responses'][keyof S['responses']]['applicationPdf'] extends ZodType
+                ? S['responses'][keyof S['responses']]['applicationPdf']
                 : typeof zodUndefined)
           >
         : unknown

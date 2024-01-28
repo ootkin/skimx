@@ -50,6 +50,9 @@ function generateResponses(
         ...(rest.textHtml && {
           'text/html': { schema: rest.textHtml },
         }),
+        ...(rest.applicationPdf && {
+          'application/pdf': { schema: rest.applicationPdf },
+        }),
       },
     };
   });
