@@ -4,7 +4,7 @@ import { defineConfig } from 'vitepress';
 export default defineConfig({
   title: 'SkimX',
   base: '/skimx/',
-  description: 'Create web applications using OpenAPI schemas',
+  description: 'SkimX streamlines web application development with OpenAPI schemas that validate and infer types, ensuring consistency between contracts and codebases.',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
@@ -22,8 +22,6 @@ export default defineConfig({
       },
     ],
 
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/ootkin/skimx' },
-    ],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/ootkin/skimx' }],
   },
 });
