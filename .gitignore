@@ -135,3 +135,6 @@ spec.json
 openapi.yaml
 
 src/test.ts
+
+docs/.vitepress/dist
+docs/.vitepress/cache
