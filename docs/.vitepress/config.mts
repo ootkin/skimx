@@ -26,6 +26,6 @@ export default defineConfig({
     socialLinks: [{ icon: 'github', link: 'https://github.com/ootkin/skimx' }],
   },
   sitemap: {
-    hostname: 'https://skimx.ootkin.com',
+    hostname: 'https://ootkin.github.io/skimx/',
   },
 });
