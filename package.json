@@ -22,7 +22,7 @@
   "scripts": {
     "test": "jest --coverage --runInBand",
     "lint": "eslint --cache ./src",
-    "lint:fix": "eslint --cache --fix ./src",
+    "lint:fix": "eslint --cache --fix",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "prepare": "husky install",
