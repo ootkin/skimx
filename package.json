@@ -55,7 +55,7 @@
   },
   "lint-staged": {
     "*.ts": "npm run lint:fix",
-    "*.{ts,md,yaml,yml,json,js}": "npm run format:fix"
+    "*.{ts,md,yaml,yml,json,js,html}": "npm run format:fix"
   },
   "dependencies": {
     "express": "^4.19.2",
