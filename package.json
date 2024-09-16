@@ -60,7 +60,7 @@
   "dependencies": {
     "express": "^4.19.2",
     "js-yaml": "^4.1.0",
-    "zod-openapi": "^2.18.0"
+    "zod-openapi": "^2.19.0"
   },
   "publishConfig": {
     "access": "public",
